@@ -3,18 +3,18 @@ module github.com/starshine-sys/oodles
 go 1.17
 
 require (
+	emperror.dev/errors v0.8.0
 	github.com/BurntSushi/toml v0.4.1
 	github.com/diamondburned/arikawa/v3 v3.0.0-rc.2.0.20210928211204-8ea320ccb91f
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/rubenv/sql-migrate v0.0.0-20211023115951-9f02b1e13857
 	github.com/spf13/cast v1.4.1
-	github.com/starshine-sys/bcr v0.21.1-0.20210929173146-1f0a766ade82
+	github.com/starshine-sys/bcr v0.21.1-0.20211105204030-b325d5180064
 	go.uber.org/zap v1.16.0
 )
 
 require (
-	emperror.dev/errors v0.8.0 // indirect
 	github.com/ReneKroon/ttlcache/v2 v2.1.0 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect

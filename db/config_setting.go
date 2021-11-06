@@ -49,3 +49,13 @@ func (s ConfigSetting) ToRoleID() discord.RoleID {
 func (s ConfigSetting) ToUserID() discord.UserID {
 	return discord.UserID(s.ToUint())
 }
+
+// ToSnowflake returns the ConfigSetting as a discord.Snowflake
+func (s ConfigSetting) ToSnowflake() discord.Snowflake {
+	return discord.Snowflake(s.ToUint())
+}
+
+// ToInterface returns the ConfigSetting as an interface
+func (s ConfigSetting) ToInterface() interface{} {
+	return s.val
+}

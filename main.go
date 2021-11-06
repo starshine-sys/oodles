@@ -9,6 +9,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/starshine-sys/oodles/bot"
+	"github.com/starshine-sys/oodles/cmds/meta"
 	"github.com/starshine-sys/oodles/common"
 )
 
@@ -26,6 +27,9 @@ func main() {
 	if err != nil {
 		common.Log.Fatalf("Error creating bot: %v", err)
 	}
+
+	// add commands/handlers
+	meta.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()

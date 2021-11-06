@@ -13,6 +13,12 @@ type BotConfig struct {
 	GuildID discord.GuildID  `toml:"guild_id"`
 
 	Backgrounds []Background `toml:"backgrounds"`
+
+	Help struct {
+		Title       string       `toml:"title"`
+		Description string       `toml:"description"`
+		Fields      []EmbedField `toml:"fields"`
+	} `toml:"help"`
 }
 
 // Background is a level background.
@@ -21,4 +27,10 @@ type Background struct {
 	Filename    string `toml:"filename"`
 	Emoji       string `toml:"emoji"`
 	Description string `toml:"description"`
+}
+
+// EmbedField ...
+type EmbedField struct {
+	Name  string `toml:"name"`
+	Value string `toml:"value"`
 }

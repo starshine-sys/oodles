@@ -1,6 +1,7 @@
 package db
 
-const arikawaDocumentationBase = "https://pkg.go.dev/github.com/diamondburned/arikawa/v3"
+// ArikawaDocumentationBase ...
+const ArikawaDocumentationBase = "https://pkg.go.dev/github.com/diamondburned/arikawa/v3"
 
 // ConfigOptions are all configuration options
 var ConfigOptions = map[string]ConfigOption{
@@ -9,6 +10,23 @@ var ConfigOptions = map[string]ConfigOption{
 		Description:  "The prefix used for bot commands. Case-insensitive.",
 		Type:         StringOptionType,
 		DefaultValue: ".",
+	},
+	"activity": {
+		Description:  "The activity shown in the bot's status.",
+		Type:         StringOptionType,
+		DefaultValue: "",
+	},
+	"activity_type": {
+		Description:  "The activity type shown in the bot's status. Valid options are: `playing`, `listening`, `watching`",
+		Type:         StringOptionType,
+		DefaultValue: "playing",
+		ValidValues:  []interface{}{"playing", "listening", "watching"},
+	},
+	"status": {
+		Description:  "The bot's status. Valid options are: `online`, `idle`, `dnd`",
+		Type:         StringOptionType,
+		DefaultValue: "online",
+		ValidValues:  []interface{}{"online", "idle", "dnd"},
 	},
 
 	// welcome configuration
@@ -32,7 +50,9 @@ var ConfigOptions = map[string]ConfigOption{
 
 	// application configuration
 	"discussion_channel": {
-		Description: "The channel where newly finished applications are announced. See also: `discussion_message`",
+		Description:  "The channel where newly finished applications are announced. See also: `discussion_message`",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
 	},
 
 	// verification configuration

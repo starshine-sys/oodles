@@ -11,6 +11,7 @@ type ConfigOption struct {
 	Description  string
 	Type         ConfigOptionType
 	DefaultValue interface{}
+	ValidValues  []interface{}
 }
 
 // ConfigOptionType is the configuration option's type (string, bool, float, int)
@@ -99,6 +100,7 @@ const (
 	HelperLevel   PermissionLevel = 3
 	StaffLevel    PermissionLevel = 4
 	OwnerLevel    PermissionLevel = 5
+	DisabledLevel PermissionLevel = 6
 )
 
 func (p PermissionLevel) String() string {
@@ -113,6 +115,8 @@ func (p PermissionLevel) String() string {
 		return "[4] STAFF"
 	case OwnerLevel:
 		return "[5] OWNER"
+	case DisabledLevel:
+		return "[6] DISABLED"
 	default:
 		return fmt.Sprintf("[%d] UNKNOWN", int(p))
 	}
@@ -139,6 +143,3 @@ func (c CommandOverrides) For(cmd string) PermissionLevel {
 
 	return defaultPermissions[cmd]
 }
-
-// DefaultPermissions ...
-var defaultPermissions = map[string]PermissionLevel{}

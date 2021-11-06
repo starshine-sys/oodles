@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/bcr/bot"
@@ -12,7 +13,10 @@ import (
 type Bot struct {
 	*bot.Bot
 
-	DB *db.DB
+	Colour discord.Color
+
+	DB      *db.DB
+	Checker *Checker
 }
 
 // Colour is the embed colour used throughout the bot
@@ -24,11 +28,13 @@ const Intents = gateway.IntentGuilds | gateway.IntentGuildMembers | gateway.Inte
 // New ...
 func New(conf common.BotConfig) (b *Bot, err error) {
 	b = &Bot{}
+	b.Colour = Colour
 
 	b.DB, err = db.New(conf)
 	if err != nil {
 		return nil, err
 	}
+	b.Checker = &Checker{b.DB}
 
 	r, err := bcr.NewWithIntents(conf.Token, conf.Owners, nil, Intents)
 	if err != nil {
@@ -44,6 +50,7 @@ func New(conf common.BotConfig) (b *Bot, err error) {
 
 	// bot handlers
 	b.Router.AddHandler(b.WaitForGuild)
+	b.Router.AddHandler(b.Ready)
 
 	return b, nil
 }
@@ -66,5 +73,37 @@ func (bot *Bot) WaitForGuild(ev *gateway.GuildCreateEvent) {
 func (bot *Bot) CheckIfReady() {
 	if !receivedBotGuild {
 		common.Log.Warnf("Didn't receive a guild create event for the bot guild (ID %v)! Bot will not function correctly.", bot.DB.BotConfig.GuildID)
+	}
+}
+
+// Ready ...
+func (bot *Bot) Ready(*gateway.ReadyEvent) {
+	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
+
+	usd := gateway.UpdateStatusData{
+		Status: discord.Status(bot.DB.Config.Get("status").ToString()),
+	}
+
+	activity := bot.DB.Config.Get("activity").ToString()
+	activityType := bot.DB.Config.Get("activity_type").ToString()
+
+	if activity != "" {
+		a := discord.Activity{
+			Name: activity,
+		}
+
+		switch activityType {
+		case "listening":
+			a.Type = discord.ListeningActivity
+		default:
+			a.Type = discord.GameActivity
+		}
+
+		usd.Activities = []discord.Activity{a}
+	}
+
+	err := s.UpdateStatus(usd)
+	if err != nil {
+		common.Log.Errorf("Error setting status: %v", err)
 	}
 }

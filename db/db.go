@@ -12,6 +12,9 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	migrate "github.com/rubenv/sql-migrate"
 	"github.com/starshine-sys/oodles/common"
+
+	// pgx driver for migrations
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 // DB ...

@@ -32,6 +32,8 @@ func init() {
 	Log = logger.Sugar()
 
 	if Version == "" {
+		Log.Info("Version not set, falling back to checking current directory.")
+
 		git := exec.Command("git", "rev-parse", "--short", "HEAD")
 		// ignoring errors *should* be fine? if there's no output we just fall back to "unknown"
 		b, _ := git.Output()
