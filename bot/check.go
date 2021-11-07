@@ -12,6 +12,7 @@ import (
 // Checker ...
 type Checker struct {
 	*db.DB
+	*Bot
 }
 
 func (c Checker) String(ctx bcr.Contexter) string {
@@ -24,13 +25,28 @@ func (c Checker) String(ctx bcr.Contexter) string {
 	case 0:
 		return "shouldn't get here"
 	case 1:
-		return c.DB.Overrides.For(v.FullCommandPath[0]).String()
-	default:
-		if strings.EqualFold(v.FullCommandPath[0], "help") {
-			return c.DB.Overrides.For(v.FullCommandPath[1]).String()
+		cmd := c.Router.GetCommand(v.FullCommandPath[0])
+		if cmd == nil {
+			return db.DisabledLevel.String()
 		}
 
-		return c.DB.Overrides.For(v.FullCommandPath[0]).String()
+		return c.DB.Overrides.For(cmd.Name).String()
+	default:
+		if strings.EqualFold(v.FullCommandPath[0], "help") {
+			cmd := c.Router.GetCommand(v.FullCommandPath[1])
+			if cmd == nil {
+				return db.DisabledLevel.String()
+			}
+
+			return c.DB.Overrides.For(cmd.Name).String()
+		}
+
+		cmd := c.Router.GetCommand(v.FullCommandPath[0])
+		if cmd == nil {
+			return db.DisabledLevel.String()
+		}
+
+		return c.DB.Overrides.For(cmd.Name).String()
 	}
 }
 
@@ -52,7 +68,13 @@ func (c *Checker) Check(ctx bcr.Contexter) (bool, error) {
 		return false, errors.New("shouldn't get here")
 	}
 
-	required := c.DB.Overrides.For(v.FullCommandPath[0])
+	var required db.PermissionLevel
+	cmd := c.Router.GetCommand(v.FullCommandPath[0])
+	if cmd == nil {
+		required = db.InvalidLevel
+	} else {
+		required = c.DB.Overrides.For(cmd.Name)
+	}
 
 	lvl := c.DB.Perms.Level(m)
 

@@ -54,6 +54,11 @@ var ConfigOptions = map[string]ConfigOption{
 		Type:         SnowflakeOptionType,
 		DefaultValue: 0,
 	},
+	"application_channel_message": {
+		Description:  "The message that is posted in the application channel. `{guild}` is replaced with the guild name.",
+		Type:         StringOptionType,
+		DefaultValue: "Thank you for joining {guild}!\nWe hope you enjoy your stay.",
+	},
 
 	// verification configuration
 	"verified_role": {

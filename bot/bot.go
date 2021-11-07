@@ -7,6 +7,7 @@ import (
 	"github.com/starshine-sys/bcr/bot"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/db"
+	"github.com/starshine-sys/pkgo"
 )
 
 // Bot ...
@@ -17,6 +18,7 @@ type Bot struct {
 
 	DB      *db.DB
 	Checker *Checker
+	PK      *pkgo.Session
 }
 
 // Colour is the embed colour used throughout the bot
@@ -27,14 +29,16 @@ const Intents = gateway.IntentGuilds | gateway.IntentGuildMembers | gateway.Inte
 
 // New ...
 func New(conf common.BotConfig) (b *Bot, err error) {
-	b = &Bot{}
-	b.Colour = Colour
+	b = &Bot{
+		Colour: Colour,
+		PK:     pkgo.New(""),
+	}
 
 	b.DB, err = db.New(conf)
 	if err != nil {
 		return nil, err
 	}
-	b.Checker = &Checker{b.DB}
+	b.Checker = &Checker{b.DB, b}
 
 	r, err := bcr.NewWithIntents(conf.Token, conf.Owners, nil, Intents)
 	if err != nil {
@@ -74,6 +78,11 @@ func (bot *Bot) CheckIfReady() {
 	if !receivedBotGuild {
 		common.Log.Warnf("Didn't receive a guild create event for the bot guild (ID %v)! Bot will not function correctly.", bot.DB.BotConfig.GuildID)
 	}
+}
+
+// Prefix only exists because i'm lazy
+func (bot *Bot) Prefix() string {
+	return bot.DB.Config.Get("prefix").ToString()
 }
 
 // Ready ...

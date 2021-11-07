@@ -11,6 +11,8 @@ type BotConfig struct {
 	// Immutable owners, have access to all commands regardless of overrides (except disabled commands)
 	Owners  []discord.UserID `toml:"owners"`
 	GuildID discord.GuildID  `toml:"guild_id"`
+	// Where errors and DMs are sent
+	LogChannel discord.ChannelID `toml:"log_channel"`
 
 	Backgrounds []Background `toml:"backgrounds"`
 

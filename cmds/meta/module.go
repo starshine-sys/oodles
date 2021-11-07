@@ -78,4 +78,60 @@ func Init(bot *bot.Bot) {
 		CustomPermissions: b.Checker,
 		Command:           b.helpAll,
 	})
+
+	// add other commands
+	appCommands(b)
+}
+
+func appCommands(b *Bot) {
+	app := b.Router.AddCommand(&bcr.Command{
+		Name:              "app",
+		Aliases:           []string{"application", "applications", "apps"},
+		Summary:           "Manage applications",
+		CustomPermissions: b.Checker,
+		Command: func(ctx *bcr.Context) (err error) {
+			return ctx.Help([]string{"app"})
+		},
+	})
+
+	app.AddSubcommand(&bcr.Command{
+		Name:              "setup",
+		Summary:           "Send the application trigger message in the current channel.",
+		CustomPermissions: b.Checker,
+		Command:           b.setupMessage,
+	})
+
+	track := app.AddSubcommand(&bcr.Command{
+		Name:              "track",
+		Aliases:           []string{"tracks"},
+		Summary:           "List and manage application tracks.",
+		CustomPermissions: b.Checker,
+		Command:           b.listAppTracks,
+	})
+
+	track.AddSubcommand(&bcr.Command{
+		Name:              "create",
+		Summary:           "Create an application track",
+		Usage:             "<name> <description> <emoji>",
+		Args:              bcr.MinArgs(3),
+		CustomPermissions: b.Checker,
+		Command:           b.createAppTrack,
+	})
+
+	questions := app.AddSubcommand(&bcr.Command{
+		Name:              "questions",
+		Aliases:           []string{"question", "q"},
+		Summary:           "List or manage application questions",
+		CustomPermissions: b.Checker,
+		Command:           b.listQuestions,
+	})
+
+	questions.AddSubcommand(&bcr.Command{
+		Name:              "add",
+		Summary:           "Add questions to the given application track",
+		Description:       "Add questions to the given application track. Separate questions with a |",
+		Usage:             "<id> <questions...>",
+		CustomPermissions: b.Checker,
+		Command:           b.addQuestion,
+	})
 }

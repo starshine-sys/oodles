@@ -23,6 +23,10 @@ func main() {
 
 	common.Log.Infof("Starting Oodles version %v", common.Version)
 
+	if !conf.LogChannel.IsValid() {
+		common.Log.Warn("Warning: log_channel in config file is not valid. Errors will only be logged to console, and DMs will not be forwarded.")
+	}
+
 	b, err := bot.New(conf)
 	if err != nil {
 		common.Log.Fatalf("Error creating bot: %v", err)

@@ -9,9 +9,10 @@ create table guilds (
 );
 
 create table application_tracks (
-    id      serial  primary key,
-    name    text    not null,
-    emoji   text    not null unique
+    id          serial  primary key,
+    name        text    not null,
+    description text    not null,
+    emoji       text    not null unique
 );
 
 create table app_questions (

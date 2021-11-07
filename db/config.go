@@ -141,5 +141,9 @@ func (c CommandOverrides) For(cmd string) PermissionLevel {
 		return lvl
 	}
 
-	return defaultPermissions[cmd]
+	lvl, ok = defaultPermissions[cmd]
+	if !ok {
+		return DisabledLevel
+	}
+	return lvl
 }
