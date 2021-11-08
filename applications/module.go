@@ -7,6 +7,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/bot"
 )
 
@@ -21,6 +22,23 @@ func Init(bot *bot.Bot) {
 
 	b.Router.AddHandler(b.interactionCreate)
 	b.Router.AddHandler(b.messageCreate)
+	b.Router.AddHandler(b.guildMemberAdd)
+	b.Router.AddHandler(b.guildMemberRemove)
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "verify",
+		Aliases:           []string{"accept", "approve"},
+		Summary:           "Verify the current application.",
+		CustomPermissions: b.Checker,
+		Command:           b.verify,
+	})
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "close",
+		Summary:           "Close the current application.",
+		CustomPermissions: b.Checker,
+		Command:           b.closeApp,
+	})
 }
 
 func (bot *Bot) initialResponse(ev *gateway.InteractionCreateEvent) error {

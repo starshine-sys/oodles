@@ -35,7 +35,7 @@ func (bot *Bot) completeApp(app *db.Application, m *gateway.MessageCreateEvent) 
 		msg, err := s.SendMessage(discussion, fmt.Sprintf("%v (%v) has finished their application! What do you think?", app.UserID.Mention(), app.ChannelID.Mention()))
 		if err == nil {
 			go func() {
-				for _, e := range []discord.APIEmoji{"✅", "❌", " 🤔"} {
+				for _, e := range []discord.APIEmoji{"✅", "❌", "🤔"} {
 					s.React(msg.ChannelID, msg.ID, e)
 				}
 			}()

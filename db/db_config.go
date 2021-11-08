@@ -30,18 +30,15 @@ func (db *DB) fetchConfig() error {
 
 // SyncConfig synchronizes configuration with the database.
 func (db *DB) SyncConfig() error {
-	_, err := db.Exec(context.Background(), "update guilds set config = $1 where id = $2", db.Config, db.BotConfig.GuildID)
-	return err
+	return db.QueryRow(context.Background(), "update guilds set config = $1 where id = $2 returning config", db.Config, db.BotConfig.GuildID).Scan(&db.Config)
 }
 
 // SyncPerms synchronizes role/user permissions with the database.
 func (db *DB) SyncPerms() error {
-	_, err := db.Exec(context.Background(), "update guilds set perms = $1 where id = $2", db.Perms, db.BotConfig.GuildID)
-	return err
+	return db.QueryRow(context.Background(), "update guilds set perms = $1 where id = $2 returning perms", db.Perms, db.BotConfig.GuildID).Scan(&db.Perms)
 }
 
 // SyncOverrides synchronizes command overrides with the database.
 func (db *DB) SyncOverrides() error {
-	_, err := db.Exec(context.Background(), "update guilds set commands = $1 where id = $2", db.Overrides, db.BotConfig.GuildID)
-	return err
+	return db.QueryRow(context.Background(), "update guilds set commands = $1 where id = $2 returning commands", db.Overrides, db.BotConfig.GuildID).Scan(&db.Overrides)
 }

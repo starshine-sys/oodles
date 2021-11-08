@@ -54,6 +54,11 @@ var ConfigOptions = map[string]ConfigOption{
 		Type:         SnowflakeOptionType,
 		DefaultValue: 0,
 	},
+	"transcript_channel": {
+		Description:  "The channel where application transcripts are saved.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
 	"discussion_channel": {
 		Description:  "The channel where newly finished applications are announced.",
 		Type:         SnowflakeOptionType,

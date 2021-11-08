@@ -61,7 +61,7 @@ func (db *DB) ChannelApplication(chID discord.ChannelID) (*Application, error) {
 
 // CloseApplication closes the given application.
 func (db *DB) CloseApplication(id int64) error {
-	_, err := db.Exec(context.Background(), "update applications set closed = true where id = $1", id)
+	_, err := db.Exec(context.Background(), "update applications set closed = true, closed_time = $2 where id = $1", id, time.Now().UTC())
 	return err
 }
 
@@ -86,6 +86,18 @@ func (db *DB) SetQuestionIndex(appID int64, index int) error {
 // CompleteApp ...
 func (db *DB) CompleteApp(appID int64) error {
 	_, err := db.Exec(context.Background(), "update applications set completed = true where id = $1", appID)
+	return err
+}
+
+// SetTranscript ...
+func (db *DB) SetTranscript(appID int64, chID discord.ChannelID, msgID discord.MessageID) error {
+	_, err := db.Exec(context.Background(), "update applications set transcript_channel = $1, transcript_message = $2 where id = $3", chID, msgID, appID)
+	return err
+}
+
+// SetVerified ...
+func (db *DB) SetVerified(appID int64, mod discord.UserID, verified bool, denyReason *string) error {
+	_, err := db.Exec(context.Background(), "update applications set moderator = $1, verified = $2, deny_reason = $3 where id = $4", mod, verified, denyReason, appID)
 	return err
 }
 
