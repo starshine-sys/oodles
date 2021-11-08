@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 
+	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/google/uuid"
 	"github.com/starshine-sys/bcr"
@@ -43,7 +44,7 @@ func (bot *Bot) Report(ctx *bcr.Context, err error) error {
 				Timestamp: discord.NowTimestamp(),
 			})
 			if e != nil {
-				common.Log.Errorf("Error sending error report: %v", err)
+				common.Log.Errorf("Error sending error report: %v", e)
 			}
 		}
 	}
@@ -54,4 +55,35 @@ func (bot *Bot) Report(ctx *bcr.Context, err error) error {
 			Description: fmt.Sprintf("Please report the error code above to the devs! (For example, by DMing %v)", bot.Router.Bot.Username),
 			Color:       bcr.ColourRed,
 		})
+}
+
+// SendLog ...
+func (bot *Bot) SendLog(tmpl string, args ...interface{}) {
+	bot.sendLog(false, tmpl, args...)
+}
+
+// SendError ...
+func (bot *Bot) SendError(tmpl string, args ...interface{}) {
+	bot.sendLog(true, tmpl, args...)
+}
+
+func (bot *Bot) sendLog(error bool, tmpl string, args ...interface{}) {
+	if error {
+		common.Log.Errorf(tmpl, args...)
+	} else {
+		common.Log.Infof(tmpl, args...)
+	}
+
+	if !bot.DB.BotConfig.LogChannel.IsValid() {
+		return
+	}
+
+	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
+
+	_, err := s.SendMessageComplex(bot.DB.BotConfig.LogChannel, api.SendMessageData{
+		Content: fmt.Sprintf(tmpl, args...),
+	})
+	if err != nil {
+		common.Log.Errorf("Error sending error report: %v", err)
+	}
 }

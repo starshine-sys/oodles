@@ -18,7 +18,8 @@ create table application_tracks (
 create table app_questions (
     track_id    bigint  not null    references application_tracks (id) on delete cascade,
     id          serial  primary key,
-    question    text    not null
+    question    text    not null,
+    long_answer boolean not null    default false
 );
 
 create table applications (
@@ -56,6 +57,7 @@ create table app_responses (
     message_id      bigint  not null    primary key,
     user_id         bigint  not null,
     username        text    not null,
+    discriminator   text    not null,
     content         text    not null,
 
     from_bot    bool    not null    default false,

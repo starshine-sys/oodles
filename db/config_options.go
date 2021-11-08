@@ -49,15 +49,40 @@ var ConfigOptions = map[string]ConfigOption{
 	},
 
 	// application configuration
+	"application_category": {
+		Description:  "The category where application channels are created.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
 	"discussion_channel": {
-		Description:  "The channel where newly finished applications are announced. See also: `discussion_message`",
+		Description:  "The channel where newly finished applications are announced.",
 		Type:         SnowflakeOptionType,
 		DefaultValue: 0,
 	},
 	"application_channel_message": {
-		Description:  "The message that is posted in the application channel. `{guild}` is replaced with the guild name.",
+		Description:  "The message that is posted in the applications channel. `{guild}` is replaced with the guild name.",
 		Type:         StringOptionType,
 		DefaultValue: "Thank you for joining {guild}!\nWe hope you enjoy your stay.",
+	},
+	"open_application_message": {
+		Description:  "The message that is posted when an application is opened. `{guild}` is replaced with the guild name.",
+		Type:         StringOptionType,
+		DefaultValue: "Thank you for beginning your application for {guild}.",
+	},
+	"application_finished_message": {
+		Description:  "The message that is posted when an application finishes.",
+		Type:         StringOptionType,
+		DefaultValue: "Application finished! Please continue to add proof if it included more than one screenshot, and otherwise, please be patient until a mod can review your answers.",
+	},
+	"long_answer_minimum": {
+		Description:  "Minimum number of words needed to advance questions where long answers are required.",
+		Type:         IntOptionType,
+		DefaultValue: 3,
+	},
+	"long_answer_message": {
+		Description:  "Message sent when someone's answer is too short. `{num}` is replaced with the number of words required.",
+		Type:         StringOptionType,
+		DefaultValue: "Sorry, but your answer is too short! Please resend it, and make sure it's at least {num} words long.",
 	},
 
 	// verification configuration

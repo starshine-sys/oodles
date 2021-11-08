@@ -11,6 +11,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.13.0
+	github.com/mozillazg/go-unidecode v0.1.1
 	github.com/rubenv/sql-migrate v0.0.0-20211023115951-9f02b1e13857
 	github.com/spf13/cast v1.4.1
 	github.com/starshine-sys/bcr v0.21.1-0.20211105204030-b325d5180064

@@ -54,6 +54,16 @@ func (db *DB) ApplicationTracks() (tracks []ApplicationTrack, err error) {
 	return tracks, err
 }
 
+// ApplicationTrack ...
+func (db *DB) ApplicationTrack(id int64) (*ApplicationTrack, error) {
+	var t ApplicationTrack
+	err := pgxscan.Get(context.Background(), db, &t, "select * from application_tracks where id = $1", id)
+	if err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
 // AddApplicationTrack adds an application track to the database.
 func (db *DB) AddApplicationTrack(t ApplicationTrack) (*ApplicationTrack, error) {
 	err := db.QueryRow(context.Background(), "insert into application_tracks (name, emoji, description) values ($1, $2, $3) returning id", t.Name, t.RawEmoji, t.Description).Scan(&t.ID)
@@ -71,17 +81,18 @@ func (db *DB) UpdateApplicationTrack(t ApplicationTrack) error {
 
 // AppQuestion is a single application question.
 type AppQuestion struct {
-	Index    int64
-	TrackID  int64
-	ID       int64
-	Question string
+	Index      int64
+	TrackID    int64
+	ID         int64
+	Question   string
+	LongAnswer bool
 }
 
 // Questions gets all questions for an interview track.
 func (db *DB) Questions(id int64) (qs []AppQuestion, err error) {
 	err = pgxscan.Select(context.Background(), db, &qs, `select
 	row_number() over (order by id) as index,
-	track_id, id, question
+	track_id, id, question, long_answer
 	from app_questions where track_id = $1
 	order by index asc`, id)
 	return qs, err

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/starshine-sys/oodles/applications"
 	"github.com/starshine-sys/oodles/bot"
 	"github.com/starshine-sys/oodles/cmds/meta"
 	"github.com/starshine-sys/oodles/common"
@@ -34,6 +35,7 @@ func main() {
 
 	// add commands/handlers
 	meta.Init(b)
+	applications.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()

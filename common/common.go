@@ -43,3 +43,6 @@ func init() {
 		}
 	}
 }
+
+// OpenApplication is the custom ID used for the "open application" button
+const OpenApplication = "open_application"

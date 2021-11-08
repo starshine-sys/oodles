@@ -7,6 +7,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/oodles/common"
 )
 
 func (bot *Bot) setupMessage(ctx *bcr.Context) (err error) {
@@ -28,7 +29,7 @@ func (bot *Bot) setupMessage(ctx *bcr.Context) (err error) {
 			Emoji: &discord.ButtonEmoji{
 				Name: "📜",
 			},
-			CustomID: "open_application",
+			CustomID: common.OpenApplication,
 		}},
 	}}
 

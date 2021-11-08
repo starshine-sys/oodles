@@ -3,7 +3,7 @@ package db
 // DefaultPermissions ...
 var defaultPermissions = map[string]PermissionLevel{
 	"ping":   EveryoneLevel,
-	"help":   EveryoneLevel,
+	"help":   UserLevel,
 	"config": OwnerLevel,
 	"app":    StaffLevel,
 }
