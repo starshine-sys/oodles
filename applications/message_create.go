@@ -54,7 +54,7 @@ func (bot *Bot) messageCreate(m *gateway.MessageCreateEvent) {
 
 	prev := qs[app.Question-1]
 	if prev.LongAnswer && int64(len(strings.Fields(m.Content))) < bot.DB.Config.Get("long_answer_minimum").ToInt() {
-		time.Sleep(3 * time.Second)
+		time.Sleep(waitTime)
 
 		tmpl := bot.DB.Config.Get("long_answer_message").ToString()
 		msg := strings.ReplaceAll(tmpl, "{num}", strconv.FormatInt(bot.DB.Config.Get("long_answer_minimum").ToInt(), 10))
@@ -66,7 +66,7 @@ func (bot *Bot) messageCreate(m *gateway.MessageCreateEvent) {
 		return
 	}
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(waitTime)
 	err = bot.sendInterviewMessage(app, qs[app.Question].Question)
 	if err != nil {
 		bot.SendError("Error sending message in %v: %v", app.ChannelID.Mention(), err)

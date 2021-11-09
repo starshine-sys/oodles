@@ -3,6 +3,7 @@ package applications
 import (
 	"strconv"
 	"strings"
+	"time"
 
 	"emperror.dev/errors"
 	"github.com/diamondburned/arikawa/v3/api"
@@ -12,6 +13,8 @@ import (
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/db"
 )
+
+const waitTime = 2 * time.Second
 
 func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
 	data, ok := ev.Data.(*discord.ComponentInteractionData)

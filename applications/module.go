@@ -2,6 +2,7 @@ package applications
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
@@ -14,11 +15,14 @@ import (
 // Bot ...
 type Bot struct {
 	*bot.Bot
+
+	deniedMu sync.RWMutex
+	denied   map[discord.UserID]struct{}
 }
 
 // Init ...
 func Init(bot *bot.Bot) {
-	b := &Bot{bot}
+	b := &Bot{bot, sync.RWMutex{}, make(map[discord.UserID]struct{})}
 
 	b.Router.AddHandler(b.interactionCreate)
 	b.Router.AddHandler(b.messageCreate)
@@ -38,6 +42,13 @@ func Init(bot *bot.Bot) {
 		Summary:           "Close the current application.",
 		CustomPermissions: b.Checker,
 		Command:           b.closeApp,
+	})
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "deny",
+		Summary:           "Deny the current application.",
+		CustomPermissions: b.Checker,
+		Command:           b.deny,
 	})
 }
 

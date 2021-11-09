@@ -27,6 +27,12 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 		return
 	}
 
+	bot.deniedMu.RLock()
+	defer bot.deniedMu.RUnlock()
+	if _, ok := bot.denied[ev.User.ID]; ok {
+		return
+	}
+
 	if app.Closed || (app.Verified != nil && *app.Verified) {
 		return
 	}

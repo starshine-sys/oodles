@@ -8,4 +8,5 @@ var defaultPermissions = map[string]PermissionLevel{
 	"app":    StaffLevel,
 	"verify": HelperLevel,
 	"close":  HelperLevel,
+	"deny":   HelperLevel,
 }

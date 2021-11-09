@@ -45,7 +45,7 @@ var ConfigOptions = map[string]ConfigOption{
 		Description: "The message sent in `welcome_channel` when a user is denied. If empty, denials will not be posted publicly.\nAccepted variables are:\n- `{{.Guild}}`: the [guild]({docs}/discord#Guild) the user is denied in\n- `{{.User}}`: the [user]({docs}/discord#User) that was denied\n- `{{.Denier}}`: the [member]({docs}/discord#Member) that denied the user\n- `{{.Reason}}`: the reason the user was denied, or \"No reason specified\" if no reason was given.",
 
 		Type:         StringOptionType,
-		DefaultValue: "{{.User.Mention}} ({{.User.Tag}}) was denied entry to the server by {{.Denier.User.Username}}.\nReason: {{.Reason}}",
+		DefaultValue: "{{.User.Mention}} ({{.User.Tag}}) was denied entry to the server by {{displayName .Denier}}.\nReason: {{.Reason}}",
 	},
 
 	// application configuration

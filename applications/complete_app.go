@@ -23,7 +23,7 @@ func (bot *Bot) completeApp(app *db.Application, m *gateway.MessageCreateEvent) 
 	msg := bot.DB.Config.Get("application_finished_message").ToString()
 
 	// give time for pk to proxy
-	time.Sleep(3 * time.Second)
+	time.Sleep(waitTime)
 	err = bot.sendInterviewMessage(app, msg)
 	if err != nil {
 		bot.SendError("Error sending finished message to app %v: %v", app.ID, err)
