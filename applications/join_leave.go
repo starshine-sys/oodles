@@ -50,8 +50,8 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 	})
 
 	_, err = bot.createTranscript(s, app)
-	if err == errNoTranscriptChannel {
-		return
+	if common.IsOodlesError(err) {
+		s.SendMessage(app.ChannelID, fmt.Sprintf("❌ %v", err))
 	} else if err != nil {
 		common.Log.Errorf("Error saving transcript: %v", err)
 		s.SendMessage(app.ChannelID, fmt.Sprintf("I wasn't able to save a transcript:\n> %v", err))

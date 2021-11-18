@@ -46,6 +46,8 @@ func New(conf common.BotConfig) (b *Bot, err error) {
 	}
 	b.Bot = bot.NewWithRouter(r)
 
+	b.Router.Prefixes = []string{b.DB.Config.Get("prefix").ToString()}
+
 	b.Router.EmbedColor = Colour
 	b.Router.Prefixer = b.DB.Prefixer
 
@@ -70,6 +72,8 @@ func (bot *Bot) WaitForGuild(ev *gateway.GuildCreateEvent) {
 	if ev.ID == bot.DB.BotConfig.GuildID {
 		receivedBotGuild = true
 		common.Log.Infof("Received guild create event for bot guild (%v, %v), bot is ready!", ev.Name, ev.ID)
+	} else {
+		common.Log.Warnf("Received guild create event for non-bot guild %v (%v)", ev.Name, ev.ID)
 	}
 }
 

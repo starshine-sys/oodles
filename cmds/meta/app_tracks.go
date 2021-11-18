@@ -60,10 +60,6 @@ func (bot *Bot) createAppTrack(ctx *bcr.Context) (err error) {
 }
 
 func (bot *Bot) addQuestion(ctx *bcr.Context) (err error) {
-	if len(ctx.Args) < 2 {
-		return ctx.SendX("You need to give a track ID and questions!")
-	}
-
 	track := ctx.Args[0]
 	trackID, err := strconv.ParseInt(track, 10, 64)
 	if err != nil {

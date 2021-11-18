@@ -184,6 +184,8 @@ func (bot *Bot) configSet(ctx *bcr.Context) (err error) {
 		common.Log.Errorf("Error syncing configuration with database: %v", err)
 		return ctx.SendfX("Error syncing configuration with database: %v", err)
 	}
+	// fuck we need to set this or argument checks cause a panic
+	bot.Router.Prefixes = []string{bot.DB.Config.Get("prefix").ToString()}
 
 	_, err = ctx.Reply("Success! ``%v`` is now set to:\n>>> %v", bcr.EscapeBackticks(name), input)
 	return

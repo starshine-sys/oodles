@@ -3,6 +3,7 @@ module github.com/starshine-sys/oodles
 go 1.17
 
 require (
+	codeberg.org/eviedelta/detctime v0.0.0-20201201223733-52d0e0a1ba3d
 	emperror.dev/errors v0.8.0
 	github.com/BurntSushi/toml v0.4.1
 	github.com/diamondburned/arikawa/v3 v3.0.0-rc.2.0.20210928211204-8ea320ccb91f

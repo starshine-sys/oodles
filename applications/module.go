@@ -32,23 +32,41 @@ func Init(bot *bot.Bot) {
 	b.Router.AddCommand(&bcr.Command{
 		Name:              "verify",
 		Aliases:           []string{"accept", "approve"},
-		Summary:           "Verify the current application.",
+		Summary:           "Verify the current application",
 		CustomPermissions: b.Checker,
 		Command:           b.verify,
 	})
 
 	b.Router.AddCommand(&bcr.Command{
 		Name:              "close",
-		Summary:           "Close the current application.",
+		Summary:           "Close the current application",
 		CustomPermissions: b.Checker,
 		Command:           b.closeApp,
 	})
 
 	b.Router.AddCommand(&bcr.Command{
 		Name:              "deny",
-		Summary:           "Deny the current application.",
+		Summary:           "Deny the current application",
+		Usage:             "[reason...]",
 		CustomPermissions: b.Checker,
 		Command:           b.deny,
+	})
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "logs",
+		Summary:           "Show application logs for the given user",
+		Usage:             "<user>",
+		Args:              bcr.MinArgs(1),
+		CustomPermissions: b.Checker,
+		Command:           b.logs,
+	})
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "unverified",
+		Summary:           "Show users who are unverified with no open application",
+		Usage:             "[since]",
+		CustomPermissions: b.Checker,
+		Command:           b.unverified,
 	})
 }
 

@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"emperror.dev/errors"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/state"
@@ -15,16 +14,24 @@ import (
 	"github.com/starshine-sys/oodles/db"
 )
 
-const errNoTranscriptChannel = errors.Sentinel("no transcript channel")
-
 func (bot *Bot) createTranscript(s *state.State, app *db.Application) (*discord.Message, error) {
+	outcome := "User left the server"
+	if app.Verified != nil {
+		if *app.Verified {
+			outcome = "User was verified"
+		} else {
+			outcome = "User was denied"
+		}
+	}
+
+	msg, err := s.SendMessage(app.ChannelID, fmt.Sprintf("Application complete! %v.", outcome))
+	if err != nil {
+		return nil, err
+	}
+
 	tch := bot.DB.Config.Get("transcript_channel").ToChannelID()
 	if !tch.IsValid() {
-		_, err := s.SendMessage(app.ChannelID, "There is no transcript channel set, can't create a transcript!")
-		if err != nil {
-			return nil, err
-		}
-		return nil, errNoTranscriptChannel
+		return nil, common.Error("There is no transcript channel set, can't create a transcript!")
 	}
 
 	g, err := s.Guild(bot.DB.BotConfig.GuildID)
@@ -89,15 +96,6 @@ func (bot *Bot) createTranscript(s *state.State, app *db.Application) (*discord.
 			Username:      "unknown",
 			Discriminator: "0000",
 			ID:            app.UserID,
-		}
-	}
-
-	outcome := "User left the server"
-	if app.Verified != nil {
-		if *app.Verified {
-			outcome = "User was verified"
-		} else {
-			outcome = "User was denied"
 		}
 	}
 
@@ -171,7 +169,7 @@ func (bot *Bot) createTranscript(s *state.State, app *db.Application) (*discord.
 		})
 	}
 
-	msg, err := s.SendMessageComplex(tch, api.SendMessageData{
+	logMsg, err := s.SendMessageComplex(tch, api.SendMessageData{
 		Embeds: []discord.Embed{e},
 		Files: []sendpart.File{{
 			Name:   "transcript.html",
@@ -182,12 +180,12 @@ func (bot *Bot) createTranscript(s *state.State, app *db.Application) (*discord.
 		return nil, err
 	}
 
-	err = bot.DB.SetTranscript(app.ID, tch, msg.ID)
+	err = bot.DB.SetTranscript(app.ID, tch, logMsg.ID)
 	if err != nil {
 		bot.SendError("Error saving transcript in database: %v", err)
 	}
 
-	_, err = s.SendMessage(app.ChannelID, fmt.Sprintf("Application complete! %v.\nTranscript link: https://discord.com/channels/%v/%v/%v", outcome, bot.DB.BotConfig.GuildID, tch, msg.ID))
+	_, err = s.EditMessage(app.ChannelID, msg.ID, fmt.Sprintf("Application complete! %v.\nTranscript link: https://discord.com/channels/%v/%v/%v", outcome, bot.DB.BotConfig.GuildID, tch, logMsg.ID))
 	if err != nil {
 		common.Log.Errorf("Error sending confirmation message: %v", err)
 	}

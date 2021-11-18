@@ -113,7 +113,7 @@ func (bot *Bot) memberInfo(ctx *bcr.Context) (err error) {
 			},
 			{
 				Name:   "Username",
-				Value:  m.User.Username + "#" + m.User.Discriminator,
+				Value:  m.User.Tag(),
 				Inline: true,
 			},
 			{
@@ -170,14 +170,6 @@ func (bot *Bot) memberInfo(ctx *bcr.Context) (err error) {
 		},
 	}...)
 
-	if u, err := ctx.State.User(m.User.ID); err == nil {
-		if u.Banner != "" {
-			e.Image = &discord.EmbedImage{
-				URL: u.BannerURL() + "?size=1024",
-			}
-		}
-	}
-
 	if sys, err := bot.PK.Account(pkgo.Snowflake(m.User.ID)); err == nil {
 		val := fmt.Sprintf("**ID:** %v", sys.ID)
 		if sys.Name != "" {
@@ -200,8 +192,7 @@ func (bot *Bot) memberInfo(ctx *bcr.Context) (err error) {
 func (bot *Bot) userInfo(ctx *bcr.Context) (err error) {
 	u, err := ctx.ParseUser(ctx.RawArgs)
 	if err != nil {
-		_, err = ctx.Send("User not found.")
-		return
+		return ctx.SendfX("User ``%v`` not found.", bcr.EscapeBackticks(ctx.RawArgs))
 	}
 
 	e := discord.Embed{
@@ -247,12 +238,6 @@ func (bot *Bot) userInfo(ctx *bcr.Context) (err error) {
 
 	if u.Accent != 0 {
 		e.Color = u.Accent
-	}
-
-	if u.Banner != "" {
-		e.Image = &discord.EmbedImage{
-			URL: u.BannerURL() + "?size=1024",
-		}
 	}
 
 	_, err = ctx.Send("", e)

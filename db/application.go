@@ -39,6 +39,15 @@ type Application struct {
 	TranscriptMessage *discord.MessageID
 }
 
+// AllUserApplications returns all of this user's applications, sorted by ID descending.
+func (db *DB) AllUserApplications(userID discord.UserID) (as []Application, err error) {
+	err = pgxscan.Select(context.Background(), db, &as, "select * from applications where user_id = $1 order by id desc", userID)
+	if err != nil {
+		return nil, errors.Cause(err)
+	}
+	return as, nil
+}
+
 // UserApplication returns an open application for the given user.
 func (db *DB) UserApplication(userID discord.UserID) (*Application, error) {
 	var a Application

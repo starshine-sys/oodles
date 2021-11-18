@@ -23,6 +23,15 @@ func Init(bot *bot.Bot) {
 		Command:           b.ping,
 	})
 
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "userinfo",
+		Aliases:           []string{"ui"},
+		Summary:           "Show user information",
+		Usage:             "[user]",
+		CustomPermissions: b.Checker,
+		Command:           b.memberInfo,
+	})
+
 	conf := b.Router.AddCommand(&bcr.Command{
 		Name:              "config",
 		Summary:           "Configure bot settings",
@@ -131,6 +140,7 @@ func appCommands(b *Bot) {
 		Summary:           "Add questions to the given application track",
 		Description:       "Add questions to the given application track. Separate questions with a |",
 		Usage:             "<id> <questions...>",
+		Args:              bcr.MinArgs(2),
 		CustomPermissions: b.Checker,
 		Command:           b.addQuestion,
 	})
