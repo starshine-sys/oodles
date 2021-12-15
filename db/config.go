@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 )
 
 // ConfigOption is a single configuration option definition
@@ -132,16 +133,23 @@ func (p PermissionLevel) String() string {
 // - 5: owner
 type CommandOverrides map[string]PermissionLevel
 
+var OverridesMu sync.RWMutex
+
 // For returns the permission level for the given command.
 func (c CommandOverrides) For(cmd string) PermissionLevel {
+	OverridesMu.RLock()
+	defer OverridesMu.RUnlock()
+
 	cmd = strings.ToLower(cmd)
+	fmt.Printf("command is %q\n", cmd)
 
 	lvl, ok := c[cmd]
 	if ok {
 		return lvl
 	}
+	fmt.Println("not ok")
 
-	lvl, ok = defaultPermissions[cmd]
+	lvl, ok = DefaultPermissions[cmd]
 	if !ok {
 		return DisabledLevel
 	}

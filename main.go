@@ -12,6 +12,7 @@ import (
 	"github.com/starshine-sys/oodles/bot"
 	"github.com/starshine-sys/oodles/cmds/meta"
 	"github.com/starshine-sys/oodles/common"
+	"github.com/starshine-sys/oodles/levels"
 )
 
 func main() {
@@ -36,6 +37,7 @@ func main() {
 	// add commands/handlers
 	meta.Init(b)
 	applications.Init(b)
+	levels.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()

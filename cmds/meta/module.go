@@ -88,6 +88,32 @@ func Init(bot *bot.Bot) {
 		Command:           b.helpAll,
 	})
 
+	perms := bot.Router.AddCommand(&bcr.Command{
+		Name:              "permissions",
+		Aliases:           []string{"perms"},
+		Summary:           "Show or modify role and user permissions",
+		CustomPermissions: b.Checker,
+		Command:           b.permsList,
+	})
+
+	perms.AddSubcommand(&bcr.Command{
+		Name:              "add",
+		Summary:           "Add a user or role to a permission level",
+		Usage:             "<level> <user or role>",
+		Args:              bcr.MinArgs(2),
+		CustomPermissions: b.Checker,
+		Command:           b.permsAdd,
+	})
+
+	perms.AddSubcommand(&bcr.Command{
+		Name:              "override",
+		Summary:           "Add a permission level override for the given root-level command",
+		Usage:             "<level> <root command>",
+		Args:              bcr.MinArgs(2),
+		CustomPermissions: b.Checker,
+		Command:           b.overrideCmdPerms,
+	})
+
 	// add other commands
 	appCommands(b)
 }

@@ -5,20 +5,25 @@ go 1.17
 require (
 	codeberg.org/eviedelta/detctime v0.0.0-20201201223733-52d0e0a1ba3d
 	emperror.dev/errors v0.8.0
+	github.com/AndreKR/multiface v0.0.0-20211114051930-f51f19dee2dc
 	github.com/BurntSushi/toml v0.4.1
-	github.com/diamondburned/arikawa/v3 v3.0.0-rc.2.0.20210928211204-8ea320ccb91f
+	github.com/diamondburned/arikawa/v3 v3.0.0-rc.3.0.20211125230224-8d78221de05c
+	github.com/disintegration/imaging v1.6.2
 	github.com/dustin/go-humanize v1.0.0
+	github.com/fogleman/gg v1.3.0
 	github.com/georgysavva/scany v0.2.9
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/google/uuid v1.1.2
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/mozillazg/go-unidecode v0.1.1
 	github.com/rubenv/sql-migrate v0.0.0-20211023115951-9f02b1e13857
 	github.com/spf13/cast v1.4.1
-	github.com/starshine-sys/bcr v0.21.1-0.20211105204030-b325d5180064
+	github.com/starshine-sys/bcr v0.21.1-0.20211126130820-956640f7427e
 	github.com/starshine-sys/dischtml v0.1.0
 	github.com/starshine-sys/pkgo v1.2.0
 	go.uber.org/zap v1.16.0
+	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 )
 
 require (
@@ -45,13 +50,14 @@ require (
 	github.com/starshine-sys/snowflake/v2 v2.0.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/zachomedia/go-bdf v0.0.0-20210522061406-1a147053be95 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/text v0.3.6 // indirect
-	golang.org/x/time v0.0.0-20210611083556-38a9dc6acbc6 // indirect
+	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )

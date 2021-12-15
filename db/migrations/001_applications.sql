@@ -49,7 +49,7 @@ create table applications (
 
     -- for linking to transcripts
     transcript_channel  bigint,
-    transcript_message  bigint,
+    transcript_message  bigint
 );
 
 create table app_responses (
@@ -61,7 +61,7 @@ create table app_responses (
     content         text    not null,
 
     from_bot    bool    not null    default false,
-    from_staff  bool    not null    default false,
+    from_staff  bool    not null    default false
 );
 
 create index applications_user_idx on applications (user_id);

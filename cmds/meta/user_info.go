@@ -37,13 +37,11 @@ func (bot *Bot) memberInfo(ctx *bcr.Context) (err error) {
 	// get global info
 	// can't do this with a single loop because the loop for colour has to break the moment it's found one
 	var (
-		userRoles   []string
 		userPerms   discord.Permissions
 		highestRole = "No roles"
 	)
 	for _, r := range rls {
 		userPerms |= r.Permissions
-		userRoles = append(userRoles, r.Mention())
 	}
 	if len(rls) > 0 {
 		highestRole = rls[0].Name
@@ -52,7 +50,7 @@ func (bot *Bot) memberInfo(ctx *bcr.Context) (err error) {
 	var perms []string
 	if ctx.Guild.OwnerID == m.User.ID {
 		perms = append(perms, "Server Owner")
-		userPerms.Add(discord.PermissionAll)
+		userPerms = userPerms.Add(discord.PermissionAll)
 	}
 	perms = append(perms, bcr.PermStringsFor(bcr.MajorPerms, userPerms)...)
 
