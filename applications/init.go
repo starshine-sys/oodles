@@ -17,7 +17,7 @@ import (
 const waitTime = 2 * time.Second
 
 func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
-	data, ok := ev.Data.(*discord.ComponentInteractionData)
+	data, ok := ev.Data.(*discord.ButtonInteraction)
 	if !ok {
 		return
 	}
@@ -29,7 +29,7 @@ func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
 		}
 	}
 
-	if strings.HasPrefix(data.CustomID, "app-track:") {
+	if strings.HasPrefix(string(data.CustomID), "app-track:") {
 		err := bot.chooseAppTrack(ev, data)
 		if err != nil {
 			common.Log.Errorf("Error in choose app track: %v", err)
@@ -37,7 +37,7 @@ func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
 	}
 }
 
-func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discord.ComponentInteractionData) (err error) {
+func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction) (err error) {
 	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
 
 	if ev.Member == nil {
@@ -96,7 +96,7 @@ func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discor
 	return
 }
 
-func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord.ComponentInteractionData) (err error) {
+func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction) (err error) {
 	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
 
 	if ev.Member == nil {
@@ -116,15 +116,15 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 	}
 
 	if app.TrackID != nil {
-		components := discord.UnwrapComponents(ev.Message.Components)
+		components := ev.Message.Components
 		for _, c := range components {
 			v, ok := c.(*discord.ActionRowComponent)
 			if ok {
-				for i := range v.Components {
-					btn, ok := v.Components[i].(*discord.ButtonComponent)
+				for i := range *v {
+					btn, ok := (*v)[i].(*discord.ButtonComponent)
 					if ok {
 						btn.Disabled = true
-						v.Components[i] = btn
+						(*v)[i] = btn
 					}
 				}
 			}
@@ -142,7 +142,7 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 		return bot.respond(ev, "You're not the user who this application is for.")
 	}
 
-	trackID, err := strconv.ParseInt(strings.TrimPrefix(data.CustomID, "app-track:"), 10, 10)
+	trackID, err := strconv.ParseInt(strings.TrimPrefix(string(data.CustomID), "app-track:"), 10, 10)
 	if err != nil {
 		return err
 	}
@@ -153,15 +153,15 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 	}
 
 	// we have a track, so finish this interaction
-	components := discord.UnwrapComponents(ev.Message.Components)
+	components := ev.Message.Components
 	for _, c := range components {
 		v, ok := c.(*discord.ActionRowComponent)
 		if ok {
-			for i := range v.Components {
-				btn, ok := v.Components[i].(*discord.ButtonComponent)
+			for i := range *v {
+				btn, ok := (*v)[i].(*discord.ButtonComponent)
 				if ok {
 					btn.Disabled = true
-					v.Components[i] = btn
+					(*v)[i] = btn
 				}
 			}
 		}

@@ -14,21 +14,11 @@ type BotConfig struct {
 	// Where errors and DMs are sent
 	LogChannel discord.ChannelID `toml:"log_channel"`
 
-	Backgrounds []Background `toml:"backgrounds"`
-
 	Help struct {
 		Title       string       `toml:"title"`
 		Description string       `toml:"description"`
 		Fields      []EmbedField `toml:"fields"`
 	} `toml:"help"`
-}
-
-// Background is a level background.
-type Background struct {
-	Name        string `toml:"name"`
-	Filename    string `toml:"filename"`
-	Emoji       string `toml:"emoji"`
-	Description string `toml:"description"`
 }
 
 // EmbedField ...

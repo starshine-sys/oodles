@@ -22,16 +22,14 @@ func (bot *Bot) setupMessage(ctx *bcr.Context) (err error) {
 		},
 	}}
 
-	components := []discord.Component{&discord.ActionRowComponent{
-		Components: []discord.Component{&discord.ButtonComponent{
-			Label: "Open application",
-			Style: discord.SecondaryButton,
-			Emoji: &discord.ButtonEmoji{
-				Name: "📜",
-			},
-			CustomID: common.OpenApplication,
-		}},
-	}}
+	components := discord.Components(&discord.ButtonComponent{
+		Label: "Open application",
+		Style: discord.SecondaryButtonStyle(),
+		Emoji: &discord.ComponentEmoji{
+			Name: "📜",
+		},
+		CustomID: common.OpenApplication,
+	})
 
 	_, err = ctx.State.SendMessageComplex(ctx.Message.ChannelID, api.SendMessageData{
 		Embeds:     embeds,

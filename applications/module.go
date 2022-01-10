@@ -8,6 +8,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/bot"
 )
@@ -42,6 +43,10 @@ func Init(bot *bot.Bot) {
 		Summary:           "Close the current application",
 		CustomPermissions: b.Checker,
 		Command:           b.closeApp,
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.BoolP("force", "F", false, "Close even if no transcript was made.")
+			return fs
+		},
 	})
 
 	b.Router.AddCommand(&bcr.Command{
@@ -67,6 +72,14 @@ func Init(bot *bot.Bot) {
 		Usage:             "[since]",
 		CustomPermissions: b.Checker,
 		Command:           b.unverified,
+	})
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "restart",
+		Summary:           "Restart an application",
+		Usage:             "[since]",
+		CustomPermissions: b.Checker,
+		Command:           b.restart,
 	})
 }
 

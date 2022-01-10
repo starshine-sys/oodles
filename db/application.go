@@ -86,6 +86,11 @@ func (db *DB) SetTrack(appID int64, trackID int64) error {
 	return err
 }
 
+func (db *DB) ResetApplication(appID int64) error {
+	_, err := db.Exec(context.Background(), "update applications set track_id = null, question = 0 where id = $1", appID)
+	return err
+}
+
 // SetQuestionIndex ...
 func (db *DB) SetQuestionIndex(appID int64, index int) error {
 	_, err := db.Exec(context.Background(), "update applications set question = $1 where id = $2", index, appID)

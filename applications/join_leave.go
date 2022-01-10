@@ -17,7 +17,10 @@ func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
 
 	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
 
-	s.SendMessage(ch, m.Mention()+" has joined the server!")
+	_, err := s.SendMessage(ch, m.Mention()+" has joined the server!")
+	if err != nil {
+		common.Log.Errorf("Error sending message: %v", err)
+	}
 }
 
 func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
@@ -48,13 +51,22 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 		Name:           "📤-app-" + unidecode.Unidecode(ev.User.Username),
 		AuditLogReason: "User left server before application was completed",
 	})
+	if err != nil {
+		common.Log.Errorf("Error updating channel title: %v", err)
+	}
 
 	_, err = bot.createTranscript(s, app)
 	if common.IsOodlesError(err) {
-		s.SendMessage(app.ChannelID, fmt.Sprintf("❌ %v", err))
+		_, err = s.SendMessage(app.ChannelID, fmt.Sprintf("❌ %v", err))
+		if err != nil {
+			common.Log.Errorf("Error sending message: %v", err)
+		}
 	} else if err != nil {
 		common.Log.Errorf("Error saving transcript: %v", err)
-		s.SendMessage(app.ChannelID, fmt.Sprintf("I wasn't able to save a transcript:\n> %v", err))
+		_, err = s.SendMessage(app.ChannelID, fmt.Sprintf("I wasn't able to save a transcript:\n> %v", err))
+		if err != nil {
+			common.Log.Errorf("Error sending message: %v", err)
+		}
 		return
 	}
 }

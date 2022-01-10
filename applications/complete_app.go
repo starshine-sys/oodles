@@ -36,7 +36,7 @@ func (bot *Bot) completeApp(app *db.Application, m *gateway.MessageCreateEvent) 
 		if err == nil {
 			go func() {
 				for _, e := range []discord.APIEmoji{"✅", "❌", "🤔"} {
-					s.React(msg.ChannelID, msg.ID, e)
+					_ = s.React(msg.ChannelID, msg.ID, e)
 				}
 			}()
 		}

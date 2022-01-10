@@ -132,15 +132,15 @@ func (bot *Bot) sendInitialMessage(ch discord.ChannelID, m discord.Member) error
 	}
 
 	var descs []string
-	var buttons []discord.Component
+	var buttons discord.ActionRowComponent
 
 	for _, t := range tracks {
 		descs = append(descs, fmt.Sprintf("%v (%s)", t.Description, t.Emoji()))
 		buttons = append(buttons, &discord.ButtonComponent{
 			Label:    t.Name,
-			CustomID: "app-track:" + strconv.FormatInt(t.ID, 10),
-			Style:    discord.SecondaryButton,
-			Emoji: &discord.ButtonEmoji{
+			CustomID: discord.ComponentID("app-track:" + strconv.FormatInt(t.ID, 10)),
+			Style:    discord.SecondaryButtonStyle(),
+			Emoji: &discord.ComponentEmoji{
 				Name:     t.Emoji().Name,
 				ID:       t.Emoji().ID,
 				Animated: t.Emoji().Animated,
@@ -151,9 +151,11 @@ func (bot *Bot) sendInitialMessage(ch discord.ChannelID, m discord.Member) error
 	e.Description += english.OxfordWordSeries(descs, "or") + "?"
 
 	_, err = s.SendMessageComplex(ch, api.SendMessageData{
-		Content:    m.Mention(),
-		Embeds:     []discord.Embed{e},
-		Components: []discord.Component{&discord.ActionRowComponent{Components: buttons}},
+		Content: m.Mention(),
+		Embeds:  []discord.Embed{e},
+		Components: discord.ContainerComponents{
+			&buttons,
+		},
 		AllowedMentions: &api.AllowedMentions{
 			Users: []discord.UserID{m.User.ID},
 		},

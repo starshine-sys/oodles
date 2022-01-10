@@ -5,6 +5,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/oodles/common"
 )
 
 func (bot *Bot) closeApp(ctx *bcr.Context) (err error) {
@@ -26,7 +27,7 @@ func (bot *Bot) closeApp(ctx *bcr.Context) (err error) {
 
 	tch := bot.DB.Config.Get("transcript_channel").ToChannelID()
 	if tch.IsValid() {
-		ctx.State.SendMessage(tch, "", discord.Embed{
+		_, err = ctx.State.SendMessage(tch, "", discord.Embed{
 			Author: &discord.EmbedAuthor{
 				Name: ctx.Author.Tag(),
 				Icon: ctx.Author.AvatarURLWithType(discord.PNGImage),
@@ -38,6 +39,9 @@ func (bot *Bot) closeApp(ctx *bcr.Context) (err error) {
 				Text: "Channel ID: " + ctx.Message.ChannelID.String(),
 			},
 		})
+		if err != nil {
+			common.Log.Errorf("Error sending message: %v", err)
+		}
 	}
 
 	err = ctx.SendX("Channel will be closed in 10 seconds!")

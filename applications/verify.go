@@ -48,9 +48,9 @@ func (bot *Bot) verify(ctx *bcr.Context) (err error) {
 		minor, timeout := ctx.ConfirmButton(ctx.Author.ID, bcr.ConfirmData{
 			Message:   "Is the new member a bodily minor or an adult?",
 			YesPrompt: "Minor",
-			YesStyle:  discord.PrimaryButton,
+			YesStyle:  discord.PrimaryButtonStyle(),
 			NoPrompt:  "Adult",
-			NoStyle:   discord.PrimaryButton,
+			NoStyle:   discord.PrimaryButtonStyle(),
 			Timeout:   2 * time.Minute,
 		})
 		if timeout {
@@ -106,7 +106,10 @@ func (bot *Bot) verify(ctx *bcr.Context) (err error) {
 			Member, Approver *discord.Member
 		}{Guild: ctx.Guild, Member: m, Approver: ctx.Member})
 		if err == nil {
-			ctx.State.SendMessage(welcCh, s)
+			_, err = ctx.State.SendMessage(welcCh, s)
+			if err != nil {
+				common.Log.Errorf("Error sending message: %v", err)
+			}
 		} else {
 			bot.SendError("Error executing welcome message template: %v", err)
 		}

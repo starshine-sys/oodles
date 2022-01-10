@@ -10,7 +10,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/dustin/go-humanize"
 	"github.com/dustin/go-humanize/english"
 	"github.com/starshine-sys/bcr"
@@ -131,20 +130,19 @@ func (bot *Bot) listQuestions(ctx *bcr.Context) (err error) {
 			Color:       bot.Colour,
 		}
 
-		sel := discord.SelectComponent{
+		sel := &discord.SelectComponent{
 			CustomID:    "question_select",
 			Placeholder: "Which track's questions do you want to view?",
-			MinValues:   option.NewInt(1),
-			MaxValues:   1,
+			ValueLimits: [2]int{1, 1},
 		}
 
 		for _, t := range tracks {
 			e.Description += fmt.Sprintf("%d. %s (%s)\n", t.ID, t.Name, t.Emoji())
-			sel.Options = append(sel.Options, discord.SelectComponentOption{
+			sel.Options = append(sel.Options, discord.SelectOption{
 				Label:       t.Name,
 				Value:       t.Name,
 				Description: t.Description,
-				Emoji: &discord.ButtonEmoji{
+				Emoji: &discord.ComponentEmoji{
 					Name:     t.Emoji().Name,
 					ID:       t.Emoji().ID,
 					Animated: t.Emoji().Animated,
@@ -153,10 +151,8 @@ func (bot *Bot) listQuestions(ctx *bcr.Context) (err error) {
 		}
 
 		msg, err := ctx.State.SendMessageComplex(ctx.Message.ChannelID, api.SendMessageData{
-			Embeds: []discord.Embed{e},
-			Components: []discord.Component{&discord.ActionRowComponent{
-				Components: []discord.Component{&sel},
-			}},
+			Embeds:     []discord.Embed{e},
+			Components: discord.Components(sel),
 		})
 		if err != nil {
 			return err
@@ -232,12 +228,12 @@ func (bot *Bot) WaitForSelect(ctx *bcr.Context, msgID discord.MessageID, customI
 			return false
 		}
 
-		data, ok := ev.Data.(*discord.ComponentInteractionData)
+		data, ok := ev.Data.(*discord.SelectInteraction)
 		if !ok {
 			return false
 		}
 
-		return data.CustomID == customID
+		return string(data.CustomID) == customID
 	})
 
 	if v == nil {
@@ -250,7 +246,7 @@ func (bot *Bot) WaitForSelect(ctx *bcr.Context, msgID discord.MessageID, customI
 		Token: ev.Token,
 	}
 
-	data := ev.Data.(*discord.ComponentInteractionData)
+	data := ev.Data.(*discord.SelectInteraction)
 	resp.Values = data.Values
 
 	return

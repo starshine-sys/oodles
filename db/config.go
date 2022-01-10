@@ -141,13 +141,11 @@ func (c CommandOverrides) For(cmd string) PermissionLevel {
 	defer OverridesMu.RUnlock()
 
 	cmd = strings.ToLower(cmd)
-	fmt.Printf("command is %q\n", cmd)
 
 	lvl, ok := c[cmd]
 	if ok {
 		return lvl
 	}
-	fmt.Println("not ok")
 
 	lvl, ok = DefaultPermissions[cmd]
 	if !ok {

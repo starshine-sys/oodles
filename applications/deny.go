@@ -46,9 +46,9 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 		yes, _ := ctx.ConfirmButton(ctx.Author.ID, bcr.ConfirmData{
 			Message:   "Are you sure you want to deny?",
 			YesPrompt: "Deny",
-			YesStyle:  discord.DangerButton,
+			YesStyle:  discord.DangerButtonStyle(),
 			NoPrompt:  "Cancel",
-			NoStyle:   discord.SecondaryButton,
+			NoStyle:   discord.SecondaryButtonStyle(),
 			Timeout:   2 * time.Minute,
 		})
 		if !yes {
@@ -71,14 +71,20 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 		if err != nil {
 			common.Log.Errorf("Error executing deny message template: %v", err)
 		} else {
-			ctx.State.SendMessage(welcCh, s)
+			_, err := ctx.State.SendMessage(welcCh, s)
+			if err != nil {
+				common.Log.Errorf("Error sending message: %v", err)
+			}
 		}
 	}
 
 	if dm {
 		ch, err := ctx.State.CreatePrivateChannel(m.User.ID)
 		if err != nil {
-			ctx.SendX("Note: I wasn't able to DM the user about their denial.")
+			err := ctx.SendX("Note: I wasn't able to DM the user about their denial.")
+			if err != nil {
+				common.Log.Errorf("Error sending message: %v", err)
+			}
 		} else {
 			_, err = ctx.State.SendEmbeds(ch.ID, discord.Embed{
 				Title:       "You were denied",
@@ -91,7 +97,10 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 				Timestamp: discord.NowTimestamp(),
 			})
 			if err != nil {
-				ctx.SendX("Note: I wasn't able to DM the user about their denial.")
+				err := ctx.SendX("Note: I wasn't able to DM the user about their denial.")
+				if err != nil {
+					common.Log.Errorf("Error sending message: %v", err)
+				}
 			} else {
 				ableToDM = true
 			}
@@ -110,7 +119,10 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 
 		err = ctx.State.Kick(ctx.Message.GuildID, app.UserID, api.AuditLogReason(fmt.Sprintf("%v (%v): %v", ctx.Author.Tag(), ctx.Author.ID, kickReason)))
 		if err != nil {
-			ctx.SendfX("I wasn't able to kick the user! Please kick them manually with Carl:\n``!kick %v %v``", m.User.ID, bcr.EscapeBackticks(reason))
+			err := ctx.SendfX("I wasn't able to kick the user! Please kick them manually with Carl:\n``!kick %v %v``", m.User.ID, bcr.EscapeBackticks(reason))
+			if err != nil {
+				common.Log.Errorf("Error sending message: %v", err)
+			}
 		}
 	}
 
