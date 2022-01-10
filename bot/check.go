@@ -21,33 +21,26 @@ func (c Checker) String(ctx bcr.Contexter) string {
 		return "slash command (implement me for those!)"
 	}
 
+	var cmdName string
 	switch len(v.FullCommandPath) {
 	case 0:
 		return "shouldn't get here"
 	case 1:
-		cmd := c.Router.GetCommand(v.FullCommandPath[0])
-		if cmd == nil {
-			return db.DisabledLevel.String()
+		if strings.EqualFold(v.FullCommandPath[0], "help") && len(v.Args) > 0 {
+			cmdName = v.Args[0]
+		} else {
+			cmdName = v.FullCommandPath[0]
 		}
-
-		return c.DB.Overrides.For(cmd.Name).String()
 	default:
-		if strings.EqualFold(v.FullCommandPath[0], "help") {
-			cmd := c.Router.GetCommand(v.FullCommandPath[1])
-			if cmd == nil {
-				return db.DisabledLevel.String()
-			}
-
-			return c.DB.Overrides.For(cmd.Name).String()
-		}
-
-		cmd := c.Router.GetCommand(v.FullCommandPath[0])
-		if cmd == nil {
-			return db.DisabledLevel.String()
-		}
-
-		return c.DB.Overrides.For(cmd.Name).String()
+		cmdName = v.FullCommandPath[0]
 	}
+
+	cmd := c.Router.GetCommand(cmdName)
+	if cmd == nil {
+		return db.DisabledLevel.String()
+	}
+
+	return c.DB.Overrides.For(cmd.Name).String()
 }
 
 // Check checks permissions!
