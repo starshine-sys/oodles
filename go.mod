@@ -17,8 +17,10 @@ require (
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/mozillazg/go-unidecode v0.1.1
+	github.com/rs/xid v1.2.1
 	github.com/rubenv/sql-migrate v0.0.0-20211023115951-9f02b1e13857
 	github.com/spf13/cast v1.4.1
+	github.com/spf13/pflag v1.0.5
 	github.com/starshine-sys/bcr v0.21.1-0.20211126130820-956640f7427e
 	github.com/starshine-sys/dischtml v0.1.0
 	github.com/starshine-sys/pkgo v1.2.0
@@ -46,7 +48,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/starshine-sys/snowflake/v2 v2.0.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect

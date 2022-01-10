@@ -90,7 +90,7 @@ func (bot *Bot) appEmbed(ctx *bcr.Context, m map[discord.UserID]*discord.User, i
 
 	e.Fields = append(e.Fields, discord.EmbedField{
 		Name:   "Opened",
-		Value:  fmt.Sprintf("<t:%v>", app.Opened.Unix()),
+		Value:  fmt.Sprintf("<t:%v>", app.ID.Time().Unix()),
 		Inline: true,
 	})
 

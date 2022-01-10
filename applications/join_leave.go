@@ -10,6 +10,11 @@ import (
 )
 
 func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
+	// don't announce bots joining
+	if m.User.Bot {
+		return
+	}
+
 	ch := bot.DB.Config.Get("welcome_channel").ToChannelID()
 	if !ch.IsValid() {
 		return

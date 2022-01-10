@@ -123,14 +123,14 @@ func (bot *Bot) createTranscript(s *state.State, app *db.Application) (*discord.
 			},
 			{
 				Name:   "Opened at",
-				Value:  fmt.Sprintf("<t:%v>", app.Opened.UTC().Unix()),
+				Value:  fmt.Sprintf("<t:%v>", app.ID.Time().UTC().Unix()),
 				Inline: true,
 			},
 		},
 		Color:     bot.Colour,
 		Timestamp: discord.NowTimestamp(),
 		Footer: &discord.EmbedFooter{
-			Text: "Application ID: " + strconv.FormatInt(app.ID, 10),
+			Text: "Application ID: " + app.ID.String(),
 		},
 	}
 

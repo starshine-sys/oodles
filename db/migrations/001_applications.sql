@@ -23,7 +23,7 @@ create table app_questions (
 );
 
 create table applications (
-    id          serial  primary key,
+    id          text    primary key, -- xid
     user_id     bigint  not null,
     channel_id  bigint  not null,
 
@@ -33,8 +33,6 @@ create table applications (
     -- not question ID, but index
     question    int     not null    default 0,
 
-    -- when the application was opened
-    opened  timestamp   not null    default (current_timestamp at time zone 'utc'),
     -- whether the application has been completed (finished the entire track)
     completed   bool    not null    default false,
     -- whether the user was verified
@@ -53,7 +51,7 @@ create table applications (
 );
 
 create table app_responses (
-    application_id  bigint  not null    references applications (id) on delete cascade,
+    application_id  text    not null    references applications (id) on delete cascade,
     message_id      bigint  not null    primary key,
     user_id         bigint  not null,
     username        text    not null,

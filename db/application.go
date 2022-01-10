@@ -7,11 +7,12 @@ import (
 	"emperror.dev/errors"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/georgysavva/scany/pgxscan"
+	"github.com/rs/xid"
 )
 
 // Application is a user's application.
 type Application struct {
-	ID        int64
+	ID        xid.ID
 	UserID    discord.UserID
 	ChannelID discord.ChannelID
 
@@ -20,8 +21,6 @@ type Application struct {
 	// Question index
 	Question int
 
-	// When the application was opened
-	Opened time.Time
 	// Whether the user has completed the automated interview section
 	Completed bool
 	// Whether the user was verified--null if not decided yet
@@ -69,55 +68,55 @@ func (db *DB) ChannelApplication(chID discord.ChannelID) (*Application, error) {
 }
 
 // CloseApplication closes the given application.
-func (db *DB) CloseApplication(id int64) error {
+func (db *DB) CloseApplication(id xid.ID) error {
 	_, err := db.Exec(context.Background(), "update applications set closed = true, closed_time = $2 where id = $1", id, time.Now().UTC())
 	return err
 }
 
 // CreateApplication ...
 func (db *DB) CreateApplication(userID discord.UserID, chID discord.ChannelID) error {
-	_, err := db.Exec(context.Background(), "insert into applications (user_id, channel_id) values ($1, $2)", userID, chID)
+	_, err := db.Exec(context.Background(), "insert into applications (id, user_id, channel_id) values ($1, $2, $3)", xid.New(), userID, chID)
 	return err
 }
 
 // SetTrack ...
-func (db *DB) SetTrack(appID int64, trackID int64) error {
+func (db *DB) SetTrack(appID xid.ID, trackID int64) error {
 	_, err := db.Exec(context.Background(), "update applications set track_id = $1, question = 0 where id = $2", trackID, appID)
 	return err
 }
 
-func (db *DB) ResetApplication(appID int64) error {
+func (db *DB) ResetApplication(appID xid.ID) error {
 	_, err := db.Exec(context.Background(), "update applications set track_id = null, question = 0 where id = $1", appID)
 	return err
 }
 
 // SetQuestionIndex ...
-func (db *DB) SetQuestionIndex(appID int64, index int) error {
+func (db *DB) SetQuestionIndex(appID xid.ID, index int) error {
 	_, err := db.Exec(context.Background(), "update applications set question = $1 where id = $2", index, appID)
 	return err
 }
 
 // CompleteApp ...
-func (db *DB) CompleteApp(appID int64) error {
+func (db *DB) CompleteApp(appID xid.ID) error {
 	_, err := db.Exec(context.Background(), "update applications set completed = true where id = $1", appID)
 	return err
 }
 
 // SetTranscript ...
-func (db *DB) SetTranscript(appID int64, chID discord.ChannelID, msgID discord.MessageID) error {
+func (db *DB) SetTranscript(appID xid.ID, chID discord.ChannelID, msgID discord.MessageID) error {
 	_, err := db.Exec(context.Background(), "update applications set transcript_channel = $1, transcript_message = $2 where id = $3", chID, msgID, appID)
 	return err
 }
 
 // SetVerified ...
-func (db *DB) SetVerified(appID int64, mod discord.UserID, verified bool, denyReason *string) error {
+func (db *DB) SetVerified(appID xid.ID, mod discord.UserID, verified bool, denyReason *string) error {
 	_, err := db.Exec(context.Background(), "update applications set moderator = $1, verified = $2, deny_reason = $3 where id = $4", mod, verified, denyReason, appID)
 	return err
 }
 
 // AppResponse ...
 type AppResponse struct {
-	ApplicationID int64
+	ApplicationID xid.ID
 	MessageID     discord.MessageID
 	UserID        discord.UserID
 	Username      string
@@ -129,7 +128,7 @@ type AppResponse struct {
 }
 
 // AddResponse adds or updates a response to an application.
-func (db *DB) AddResponse(appID int64, resp AppResponse) error {
+func (db *DB) AddResponse(appID xid.ID, resp AppResponse) error {
 	_, err := db.Exec(context.Background(), "insert into app_responses (application_id, message_id, user_id, username, discriminator, content, from_bot, from_staff) values ($1, $2, $3, $4, $5, $6, $7, $8) on conflict (message_id) do update set content = $6", appID, resp.MessageID, resp.UserID, resp.Username, resp.Discriminator, resp.Content, resp.FromBot, resp.FromStaff)
 	return err
 }
