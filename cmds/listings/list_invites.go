@@ -29,7 +29,7 @@ func (bot *Bot) listInvites(ctx *bcr.Context) error {
 
 		fields = append(fields, discord.EmbedField{
 			Name:   inv.Code,
-			Value:  fmt.Sprintf("%v\n\nUses: %v", name, inv.Uses),
+			Value:  fmt.Sprintf("(Uses: %v)\n\n%v", inv.Uses, name),
 			Inline: true,
 		})
 	}

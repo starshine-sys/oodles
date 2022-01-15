@@ -28,4 +28,14 @@ func Init(bot *bot.Bot) {
 		CustomPermissions: b.Checker,
 		Command:           b.createInvite,
 	})
+
+	invites.AddSubcommand(&bcr.Command{
+		Name:              "rename",
+		Aliases:           []string{"name"},
+		Summary:           "Name or rename an existing invite",
+		Usage:             "<code> <name>",
+		Args:              bcr.MinArgs(2),
+		CustomPermissions: b.Checker,
+		Command:           b.renameInvite,
+	})
 }

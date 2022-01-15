@@ -26,6 +26,7 @@ require (
 	github.com/starshine-sys/pkgo v1.2.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )
 
 require (
@@ -60,5 +61,4 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 	golang.org/x/time v0.0.0-20210723032227-1f47c861a9ac // indirect
 	gopkg.in/gorp.v1 v1.7.2 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
