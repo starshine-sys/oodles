@@ -130,6 +130,20 @@ func appCommands(b *Bot) {
 	})
 
 	app.AddSubcommand(&bcr.Command{
+		Name:              "export",
+		Summary:           "Export application configuration",
+		CustomPermissions: b.Checker,
+		Command:           b.exportTracks,
+	})
+
+	app.AddSubcommand(&bcr.Command{
+		Name:              "import",
+		Summary:           "Import application configuration",
+		CustomPermissions: b.Checker,
+		Command:           b.importTracks,
+	})
+
+	app.AddSubcommand(&bcr.Command{
 		Name:              "setup",
 		Summary:           "Send the application trigger message in the current channel.",
 		CustomPermissions: b.Checker,

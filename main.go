@@ -10,6 +10,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/starshine-sys/oodles/applications"
 	"github.com/starshine-sys/oodles/bot"
+	"github.com/starshine-sys/oodles/cmds/listings"
 	"github.com/starshine-sys/oodles/cmds/meta"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/levels"
@@ -38,6 +39,7 @@ func main() {
 	meta.Init(b)
 	applications.Init(b)
 	levels.Init(b)
+	listings.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()
@@ -65,9 +67,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer stop()
 
-	select {
-	case <-ctx.Done():
-	}
+	<-ctx.Done()
 
 	common.Log.Infof("Interrupt signal received. Shutting down...")
 }

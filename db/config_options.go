@@ -126,4 +126,16 @@ var ConfigOptions = map[string]ConfigOption{
 		Type:         BoolOptionType,
 		DefaultValue: false,
 	},
+
+	// logging configuration
+	"join_leave_log": {
+		Description:  "The channel to log members joining and leaving in (for mods).",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
+	"invite_channel": {
+		Description:  "The channel to create invites in.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
 }
