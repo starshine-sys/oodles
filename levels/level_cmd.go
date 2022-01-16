@@ -148,9 +148,9 @@ func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
 }
 
 const (
-	progressBarLen = 750
 	width          = 1320
 	height         = 400
+	progressBarLen = width - 450
 )
 
 func (bot *Bot) generateImage(ctx *bcr.Context,
@@ -263,7 +263,7 @@ func (bot *Bot) generateImage(ctx *bcr.Context,
 
 	img.DrawStringAnchored(fmt.Sprintf("Level %v", lvl), width-100, 200, 1, 1)
 
-	img.DrawStringAnchored(fmt.Sprintf("%v%%", int64(p*100)), 725, 295, 0.5, 0.5)
+	img.DrawStringAnchored(fmt.Sprintf("%v%%", int64(p*100)), 350+(progressBarLen/2), 295, 0.5, 0.5)
 
 	progressStr := fmt.Sprintf("%v/%v XP", humanize.Comma(progress), humanize.Comma(needed))
 
