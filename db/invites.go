@@ -6,6 +6,7 @@ import (
 	"emperror.dev/errors"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
+	"github.com/starshine-sys/oodles/common"
 )
 
 type invite struct {
@@ -47,4 +48,16 @@ func (db *DB) ClearInviteName(code string) error {
 		return pgx.ErrNoRows
 	}
 	return nil
+}
+
+func (db *DB) InviteName(code string) (name string) {
+	err := db.QueryRow(context.Background(), "select name from invites where code = $1", code).Scan(&name)
+	if err != nil && errors.Cause(err) != pgx.ErrNoRows {
+		common.Log.Errorf("Error getting invite name for code %q: %v", code, err)
+	}
+
+	if name == "" {
+		name = "Unnamed"
+	}
+	return name
 }

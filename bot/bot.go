@@ -7,7 +7,7 @@ import (
 	"github.com/starshine-sys/bcr/bot"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/db"
-	"github.com/starshine-sys/pkgo"
+	"github.com/starshine-sys/pkgo/v2"
 )
 
 // Bot ...

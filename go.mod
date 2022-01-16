@@ -13,7 +13,7 @@ require (
 	github.com/fogleman/gg v1.3.0
 	github.com/georgysavva/scany v0.2.9
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.13.0
 	github.com/mozillazg/go-unidecode v0.1.1
@@ -24,6 +24,7 @@ require (
 	github.com/starshine-sys/bcr v0.21.1-0.20211126130820-956640f7427e
 	github.com/starshine-sys/dischtml v0.1.0
 	github.com/starshine-sys/pkgo v1.2.0
+	github.com/starshine-sys/pkgo/v2 v2.0.1
 	go.uber.org/zap v1.16.0
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c

@@ -14,6 +14,7 @@ import (
 	"github.com/starshine-sys/oodles/cmds/meta"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/levels"
+	"github.com/starshine-sys/oodles/logging"
 )
 
 func main() {
@@ -40,6 +41,7 @@ func main() {
 	applications.Init(b)
 	levels.Init(b)
 	listings.Init(b)
+	logging.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()
