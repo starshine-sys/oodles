@@ -1,6 +1,9 @@
 package logging
 
 import (
+	"context"
+	"time"
+
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/starshine-sys/oodles/common"
@@ -32,8 +35,12 @@ func (bot *Bot) guildCreate(ev *gateway.GuildCreateEvent) {
 		return
 	}
 
+	common.Log.Debugf("Didn't get all members for bot guild (%v) in guild create, requesting chunks", ev.Name)
 	// otherwise, request all members
-	err = s.Gateway.RequestGuildMembers(gateway.RequestGuildMembersData{
+	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
+	defer cancel()
+
+	err = s.Gateway().Send(ctx, &gateway.RequestGuildMembersCommand{
 		GuildIDs: []discord.GuildID{ev.ID},
 	})
 	if err != nil {

@@ -1,6 +1,9 @@
 package bot
 
 import (
+	"context"
+	"time"
+
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/starshine-sys/bcr"
@@ -93,7 +96,7 @@ func (bot *Bot) Prefix() string {
 func (bot *Bot) Ready(*gateway.ReadyEvent) {
 	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
 
-	usd := gateway.UpdateStatusData{
+	usd := &gateway.UpdatePresenceCommand{
 		Status: discord.Status(bot.DB.Config.Get("status").ToString()),
 	}
 
@@ -115,7 +118,10 @@ func (bot *Bot) Ready(*gateway.ReadyEvent) {
 		usd.Activities = []discord.Activity{a}
 	}
 
-	err := s.UpdateStatus(usd)
+	ctx, cancel := context.WithTimeout(context.Background(), 25*time.Second)
+	defer cancel()
+
+	err := s.Gateway().Send(ctx, usd)
 	if err != nil {
 		common.Log.Errorf("Error setting status: %v", err)
 	}
