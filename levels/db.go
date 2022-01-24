@@ -165,3 +165,32 @@ func (bot *Bot) isBlacklisted(guildID discord.GuildID, userID discord.UserID) (b
 
 	return blacklisted
 }
+
+// getBackground gets the user's background, or a random background if they have none set, as []byte.
+func (bot *Bot) getBackground(id *int64) (blob []byte) {
+	if id != nil {
+		err := bot.DB.QueryRow(context.Background(), "select blob from level_backgrounds where id = $1").Scan(&blob)
+		if err != nil {
+			common.Log.Errorf("Error getting background ID %v: %v", id, err)
+			return nil
+		}
+		return blob
+	}
+
+	// get random background
+	var lbs []LevelBackground
+	err := pgxscan.Select(context.Background(), bot.DB, &lbs, "select * from level_backgrounds")
+	if err != nil {
+		common.Log.Errorf("Error getting backgrounds: %v", err)
+		return nil
+	}
+
+	switch len(lbs) {
+	case 0:
+		return nil
+	case 1:
+		return lbs[0].Blob
+	default:
+		return lbs[rand.Intn(len(lbs))].Blob
+	}
+}

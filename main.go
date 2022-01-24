@@ -10,6 +10,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/starshine-sys/oodles/applications"
 	"github.com/starshine-sys/oodles/bot"
+	"github.com/starshine-sys/oodles/cmds/fun"
 	"github.com/starshine-sys/oodles/cmds/listings"
 	"github.com/starshine-sys/oodles/cmds/meta"
 	"github.com/starshine-sys/oodles/common"
@@ -23,6 +24,10 @@ func main() {
 	_, err := toml.DecodeFile("config.toml", &conf)
 	if err != nil {
 		common.Log.Fatalf("Error reading configuration file: %v", err)
+	}
+	// for Docker
+	if s := os.Getenv("DATABASE_URL"); s != "" {
+		conf.Database = s
 	}
 
 	common.Log.Infof("Starting Oodles version %v", common.Version)
@@ -42,6 +47,7 @@ func main() {
 	levels.Init(b)
 	listings.Init(b)
 	logging.Init(b)
+	fun.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()

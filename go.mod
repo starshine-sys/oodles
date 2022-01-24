@@ -23,7 +23,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/starshine-sys/bcr v0.21.1-0.20211126130820-956640f7427e
 	github.com/starshine-sys/dischtml v0.1.0
-	github.com/starshine-sys/pkgo v1.2.0
 	github.com/starshine-sys/pkgo/v2 v2.0.1
 	go.uber.org/zap v1.16.0
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410

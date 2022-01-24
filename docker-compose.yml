@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  oodles:
+    build: .
+    command: ["/app/oodles"]
+    environment:
+      - "DATABASE_URL=postgresql://postgres:postgres@postgres/postgres"
+    volumes:
+      - "./config.toml:/app/config.toml:ro"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - default
+
+  postgres:
+    image: postgres:13-alpine
+    volumes:
+      - "postgres_data:/var/lib/postgresql/data"
+      - "/var/run/postgresql:/var/run/postgresql"
+    command: ["postgres",
+              "-c", "max-connections=1000",
+              "-c", "timezone=Etc/UTC",
+              "-c", "max_wal_size=1GB",
+              "-c", "min_wal_size=80MB",
+              "-c", "shared_buffers=128MB"]
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    restart: unless-stopped
+    networks:
+      - default
+
+volumes:
+  postgres_data:

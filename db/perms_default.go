@@ -15,6 +15,7 @@ var DefaultPermissions = map[string]PermissionLevel{
 	"unverified":  StaffLevel,
 	"level":       UserLevel,
 	"levelcfg":    StaffLevel,
+	"leaderboard": UserLevel,
 	"restart":     HelperLevel,
 	"invites":     StaffLevel,
 }

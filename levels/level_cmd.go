@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"image"
 	"image/color"
 	"image/png"
 	"io"
@@ -131,9 +132,13 @@ func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	img, err := bot.generateImage(ctx, username, avatarURL, clr, rank, lvl, uc.XP, xpForNext, xpForPrev)
+	img, err := bot.generateImage(
+		ctx, username, avatarURL, clr,
+		rank, lvl, uc.XP, xpForNext, xpForPrev,
+		bot.getBackground(uc.Background),
+	)
 	if err != nil {
-		common.Log.Errorf("Error generating level card, falling back to embed: %v")
+		common.Log.Errorf("Error generating level card for %v, falling back to embed: %v", u.Tag(), err)
 
 		return ctx.SendX("", bot.generateEmbed(ctx, username, avatarURL, clr, rank, lvl, uc.XP, xpForNext, xpForPrev))
 	}
@@ -156,11 +161,20 @@ const (
 func (bot *Bot) generateImage(ctx *bcr.Context,
 	name, avatarURL string, clr discord.Color,
 	rank int, lvl, xp, xpForNext, xpForPrev int64,
+	background []byte,
 ) (r io.Reader, err error) {
 
 	img := gg.NewContext(width, height)
 
 	// background
+	if background != nil {
+		bg, _, err := image.Decode(bytes.NewReader(background))
+		if err == nil {
+			bg = imaging.Resize(bg, width, 0, imaging.NearestNeighbor)
+			img.DrawImageAnchored(bg, 0, 0, 0, 0)
+		}
+	}
+
 	img.SetHexColor("#00000088")
 	img.DrawRoundedRectangle(50, 50, width-100, height-100, 20)
 	img.Fill()

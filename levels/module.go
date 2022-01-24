@@ -1,6 +1,7 @@
 package levels
 
 import (
+	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/bot"
 )
@@ -21,6 +22,21 @@ func Init(b *bot.Bot) {
 		Usage:             "[user]",
 		CustomPermissions: b.Checker,
 		Command:           bot.levelCmd,
+	})
+
+	bot.Router.AddCommand(&bcr.Command{
+		Name:    "leaderboard",
+		Aliases: []string{"lb"},
+		Summary: "Show this server's leaderboard.",
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.BoolP("full", "f", false, "Show the full leaderboard, including people who left the server.")
+
+			return fs
+		},
+
+		CustomPermissions: b.Checker,
+		Command:           bot.leaderboard,
 	})
 
 	cfg := bot.Router.AddCommand(&bcr.Command{
