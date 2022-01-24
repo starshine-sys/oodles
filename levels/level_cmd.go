@@ -9,6 +9,7 @@ import (
 	"image/png"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/AndreKR/multiface"
 	"github.com/diamondburned/arikawa/v3/api"
@@ -83,10 +84,9 @@ func init() {
 }
 
 func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
-
 	u := &ctx.Author
-	if ctx.RawArgs != "" {
-		u, err = ctx.ParseUser(ctx.RawArgs)
+	if len(ctx.Args) > 0 {
+		u, err = ctx.ParseUser(strings.Join(ctx.Args, " "))
 		if err != nil {
 			_, err = ctx.Send("User not found.")
 			return
@@ -99,8 +99,8 @@ func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
 	}
 
 	lvl := LevelFromXP(uc.XP)
-	xpForNext := XPToNext(lvl)
-	xpForPrev := XPForCurrent(lvl)
+	xpForNext := XPFromLevel(lvl + 1)
+	xpForPrev := XPFromLevel(lvl)
 
 	// get leaderboard (for rank)
 	// filter the leaderboard to match the `leaderboard` command
@@ -132,6 +132,14 @@ func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
 		}
 	}
 
+	if useEmbed, _ := ctx.Flags.GetBool("embed"); useEmbed {
+		e := bot.generateEmbed(
+			ctx, username, avatarURL, clr,
+			rank, lvl, uc.XP, xpForNext, xpForPrev,
+		)
+		return ctx.SendX("", e)
+	}
+
 	img, err := bot.generateImage(
 		ctx, username, avatarURL, clr,
 		rank, lvl, uc.XP, xpForNext, xpForPrev,
@@ -140,7 +148,11 @@ func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
 	if err != nil {
 		common.Log.Errorf("Error generating level card for %v, falling back to embed: %v", u.Tag(), err)
 
-		return ctx.SendX("", bot.generateEmbed(ctx, username, avatarURL, clr, rank, lvl, uc.XP, xpForNext, xpForPrev))
+		e := bot.generateEmbed(
+			ctx, username, avatarURL, clr,
+			rank, lvl, uc.XP, xpForNext, xpForPrev,
+		)
+		return ctx.SendX("", e)
 	}
 
 	_, err = ctx.State.SendMessageComplex(ctx.Message.ChannelID, api.SendMessageData{
@@ -301,16 +313,27 @@ func (bot *Bot) generateEmbed(ctx *bcr.Context,
 	e := discord.Embed{
 		Color:       clr,
 		Title:       fmt.Sprintf("Level %v - Rank #%v", lvl, rank),
-		Description: fmt.Sprintf("%v/%v XP", humanize.Comma(xp), humanize.Comma(XPForCurrent(lvl+1))),
-		Fields: []discord.EmbedField{{
-			Name:  "Progress to next level",
-			Value: "idk lol",
-		}},
-
-		Footer: &discord.EmbedFooter{
-			Text: name,
+		Description: fmt.Sprintf("%v/%v XP", humanize.Comma(xp), humanize.Comma(XPFromLevel(lvl+1))),
+		Thumbnail: &discord.EmbedThumbnail{
+			URL: avatarURL,
 		},
-		Timestamp: discord.NowTimestamp(),
+		Author: &discord.EmbedAuthor{
+			Name: name,
+		},
+	}
+
+	{
+		progress := xp - xpForPrev
+		needed := xpForNext - xpForPrev
+
+		p := float64(progress) / float64(needed)
+
+		percent := int64(p * 100)
+
+		e.Fields = append(e.Fields, discord.EmbedField{
+			Name:  "Progress to next level",
+			Value: fmt.Sprintf("%v%% (%v/%v)", percent, humanize.Comma(progress), humanize.Comma(needed)),
+		})
 	}
 
 	return e

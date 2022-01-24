@@ -22,15 +22,8 @@ func LevelFromXP(xp int64) (lvl int64) {
 	return int64(lvlf)
 }
 
-// XPToNext returns the total XP needed for the next level (lvl + 1)
-func XPToNext(lvl int64) (toNext int64) {
-	nextNeeded := math.Ceil(math.Pow(float64(lvl)+1, 1/exponent) * div)
-
-	return int64(nextNeeded) - XPForCurrent(lvl)
-}
-
-// XPForCurrent returns the XP needed for the current level.
-func XPForCurrent(lvl int64) (needed int64) {
+// XPFromLevel returns the XP needed for the given level.
+func XPFromLevel(lvl int64) (needed int64) {
 	return int64(
 		math.Ceil(math.Pow(float64(lvl), 1/exponent) * div),
 	)

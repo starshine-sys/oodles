@@ -16,10 +16,17 @@ func Init(b *bot.Bot) {
 	bot.Router.AddHandler(bot.messageCreate)
 
 	bot.Router.AddCommand(&bcr.Command{
-		Name:              "level",
-		Aliases:           []string{"lvl", "rank"},
-		Summary:           "Check your, or another user's, level",
-		Usage:             "[user]",
+		Name:    "level",
+		Aliases: []string{"lvl", "rank"},
+		Summary: "Check your, or another user's, level",
+		Usage:   "[user]",
+
+		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
+			fs.BoolP("embed", "e", false, "Show the rank as an embed, not a card.")
+
+			return fs
+		},
+
 		CustomPermissions: b.Checker,
 		Command:           bot.levelCmd,
 	})
@@ -27,7 +34,7 @@ func Init(b *bot.Bot) {
 	bot.Router.AddCommand(&bcr.Command{
 		Name:    "leaderboard",
 		Aliases: []string{"lb"},
-		Summary: "Show this server's leaderboard.",
+		Summary: "Show the server's leaderboard!",
 
 		Flags: func(fs *pflag.FlagSet) *pflag.FlagSet {
 			fs.BoolP("full", "f", false, "Show the full leaderboard, including people who left the server.")
