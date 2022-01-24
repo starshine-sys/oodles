@@ -19,7 +19,7 @@ create table level_config (
 
 create table level_backgrounds (
     id      serial  primary key,
-    name    text    not null,
+    name    text    not null    unique,
     source  text    not null,
     blob    bytea   not null,
 

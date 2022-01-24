@@ -11,22 +11,22 @@ import (
 	"github.com/starshine-sys/oodles/common"
 )
 
-const div = 42
-const exponent = 0.55
-
-// LevelFromXP returns the level of the given XP
-func LevelFromXP(xp int64) (lvl int64) {
-	xpf := float64(xp)
-
-	lvlf := math.Pow(math.Floor(xpf/42), 0.55)
-	return int64(lvlf)
+// XPFromLevel returns the XP needed for the given level.
+func XPFromLevel(level int64) (xp int64) {
+	return int64(5.0 / 6.0 * float64(level) * (2*math.Pow(float64(level), 2) + 27*float64(level) + 91))
 }
 
-// XPFromLevel returns the XP needed for the given level.
-func XPFromLevel(lvl int64) (needed int64) {
-	return int64(
-		math.Ceil(math.Pow(float64(lvl), 1/exponent) * div),
+// LevelFromXP returns the level of the given XP
+func LevelFromXP(xp int64) (level int64) {
+	x := float64(xp + 1)
+	pow := math.Cbrt(
+		math.Sqrt(3)*math.Sqrt(3888.0*math.Pow(x, 2)+(291600.0*x)-207025.0) - 108.0*x - 4050.0,
 	)
+
+	res := (-pow/(2.0*math.Pow(3.0, 2.0/3.0)*math.Pow(5.0, 1.0/3.0)) -
+		(61.0*math.Cbrt(5.0/3.0))/(2.0*pow) - (9.0 / 2.0))
+
+	return int64(res)
 }
 
 type GuildConfig struct {
@@ -162,7 +162,7 @@ func (bot *Bot) isBlacklisted(guildID discord.GuildID, userID discord.UserID) (b
 // getBackground gets the user's background, or a random background if they have none set, as []byte.
 func (bot *Bot) getBackground(id *int64) (blob []byte) {
 	if id != nil {
-		err := bot.DB.QueryRow(context.Background(), "select blob from level_backgrounds where id = $1").Scan(&blob)
+		err := bot.DB.QueryRow(context.Background(), "select blob from level_backgrounds where id = $1", id).Scan(&blob)
 		if err != nil {
 			common.Log.Errorf("Error getting background ID %v: %v", id, err)
 			return nil
@@ -186,4 +186,23 @@ func (bot *Bot) getBackground(id *int64) (blob []byte) {
 	default:
 		return lbs[rand.Intn(len(lbs))].Blob
 	}
+}
+
+func (bot *Bot) backgroundMetadata() (lbs []LevelBackground, err error) {
+	err = pgxscan.Select(context.Background(), bot.DB, &lbs, "select id, name, source, emoji_name, emoji_id from level_backgrounds")
+	return
+}
+
+func (bot *Bot) bgExists(id int64) (exists bool) {
+	err := bot.DB.QueryRow(context.Background(), "select exists(select id from level_backgrounds where id = $1)", id).Scan(&exists)
+	if err != nil {
+		common.Log.Errorf("Error getting background ID %v: %v", id, err)
+		return false
+	}
+	return true
+}
+
+func (bot *Bot) background(id int64) (lb LevelBackground, err error) {
+	err = pgxscan.Get(context.Background(), bot.DB, &lb, "select id, name, source, emoji_name, emoji_id from level_backgrounds where id = $1", id)
+	return
 }

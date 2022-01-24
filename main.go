@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/diamondburned/arikawa/v3/utils/ws"
 	"github.com/starshine-sys/oodles/applications"
 	"github.com/starshine-sys/oodles/bot"
 	"github.com/starshine-sys/oodles/cmds/fun"
@@ -16,6 +17,7 @@ import (
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/levels"
 	"github.com/starshine-sys/oodles/logging"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -31,6 +33,11 @@ func main() {
 	}
 
 	common.Log.Infof("Starting Oodles version %v", common.Version)
+
+	ws.WSDebug = common.Log.Debug
+	ws.WSError = func(err error) {
+		common.Log.Desugar().WithOptions(zap.AddCallerSkip(1)).Sugar().Error("Error in websocket", err)
+	}
 
 	if !conf.LogChannel.IsValid() {
 		common.Log.Warn("Warning: log_channel in config file is not valid. Errors will only be logged to console, and DMs will not be forwarded.")

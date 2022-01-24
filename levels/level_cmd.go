@@ -182,7 +182,7 @@ func (bot *Bot) generateImage(ctx *bcr.Context,
 	if background != nil {
 		bg, _, err := image.Decode(bytes.NewReader(background))
 		if err == nil {
-			bg = imaging.Resize(bg, width, 0, imaging.NearestNeighbor)
+			bg = imaging.Resize(bg, width, 0, imaging.Gaussian)
 			img.DrawImageAnchored(bg, 0, 0, 0, 0)
 		}
 	}

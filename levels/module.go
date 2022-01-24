@@ -15,7 +15,7 @@ func Init(b *bot.Bot) {
 
 	bot.Router.AddHandler(bot.messageCreate)
 
-	bot.Router.AddCommand(&bcr.Command{
+	lvl := bot.Router.AddCommand(&bcr.Command{
 		Name:    "level",
 		Aliases: []string{"lvl", "rank"},
 		Summary: "Check your, or another user's, level",
@@ -30,6 +30,16 @@ func Init(b *bot.Bot) {
 		CustomPermissions: b.Checker,
 		Command:           bot.levelCmd,
 	})
+
+	lvl.AddSubcommand(&bcr.Command{
+		Name:              "background",
+		Aliases:           []string{"bg"},
+		Summary:           "Choose a level background",
+		CustomPermissions: b.Checker,
+		Command:           bot.setBackground,
+	})
+
+	bot.Router.AddHandler(bot.chooseBackground)
 
 	bot.Router.AddCommand(&bcr.Command{
 		Name:    "leaderboard",
@@ -61,6 +71,16 @@ func Init(b *bot.Bot) {
 		Args:              bcr.MinArgs(2),
 		CustomPermissions: b.Checker,
 		Command:           bot.setConfig,
+	})
+
+	cfg.AddSubcommand(&bcr.Command{
+		Name:              "addbackground",
+		Aliases:           []string{"addbg"},
+		Summary:           "Add a level background",
+		Usage:             "<name> <emoji> <description>",
+		Args:              bcr.MinArgs(3),
+		CustomPermissions: b.Checker,
+		Command:           bot.addBackground,
 	})
 
 	bl := cfg.AddSubcommand(&bcr.Command{
