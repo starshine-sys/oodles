@@ -21,6 +21,32 @@ func Init(bot *bot.Bot) {
 	b := &Bot{bot}
 
 	b.Router.AddHandler(b.dmHandler)
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "hello",
+		Aliases:           []string{"hi"},
+		Usage:             "Say hello!",
+		CustomPermissions: b.Checker,
+		Command: func(ctx *bcr.Context) error {
+			return ctx.SendfX("Hello, %v!", ctx.DisplayName())
+		},
+	})
+
+	valid := b.Router.AddCommand(&bcr.Command{
+		Name:              "valid",
+		Usage:             "Get a valid response!",
+		CustomPermissions: b.Checker,
+		Command:           b.validCmd,
+	})
+
+	valid.AddSubcommand(&bcr.Command{
+		Name:              "+",
+		Aliases:           []string{"details"},
+		Usage:             "[id]",
+		Summary:           "Get a valid response by ID, with extra info!",
+		CustomPermissions: b.Checker,
+		Command:           b.validPlus,
+	})
 }
 
 func (bot *Bot) dmHandler(m *gateway.MessageCreateEvent) {
