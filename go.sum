@@ -308,8 +308,8 @@ github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/spf13/viper v1.4.0/go.mod h1:PTJ7Z/lr49W6bUbkmS1V3by4uWynFiR9p7+dSq/yZzE=
-github.com/starshine-sys/bcr v0.21.1-0.20211220235955-51d5e27d6e5e h1:voR19PkksxTbIhNy3nbQF3WphakinYx6ZOkLV40muxQ=
-github.com/starshine-sys/bcr v0.21.1-0.20211220235955-51d5e27d6e5e/go.mod h1:xUfJ0KK3qxEzaJvAK7W8WRgw1LC+3mOFjyQmtbSZagY=
+github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b h1:Jva39EW3WcvXKEfhpDNh63ygdeZkhsSD0FpJV8ink3I=
+github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b/go.mod h1:xUfJ0KK3qxEzaJvAK7W8WRgw1LC+3mOFjyQmtbSZagY=
 github.com/starshine-sys/dischtml v0.1.0 h1:Y+b8gU9/edTQZIG/rKwS8Yp6lECVHeOUGjq5uavh2Ks=
 github.com/starshine-sys/dischtml v0.1.0/go.mod h1:8yIpm/ZlHDmYH0Fd+ynUc3y3HzpnDM1d6+ZsO5SFJ4w=
 github.com/starshine-sys/pkgo/v2 v2.0.1 h1:Jm9WON0Y4teQyJKZjMyAia7aIA8vg/IuNmpbVZUubGM=

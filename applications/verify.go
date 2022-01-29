@@ -2,6 +2,7 @@ package applications
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -45,16 +46,25 @@ func (bot *Bot) verify(ctx *bcr.Context) (err error) {
 			toAdd = append(toAdd, adultRole)
 		}
 	} else {
-		minor, timeout := ctx.ConfirmButton(ctx.Author.ID, bcr.ConfirmData{
-			Message:   "Is the new member a bodily minor or an adult?",
-			YesPrompt: "Minor",
-			YesStyle:  discord.PrimaryButtonStyle(),
-			NoPrompt:  "Adult",
-			NoStyle:   discord.PrimaryButtonStyle(),
-			Timeout:   2 * time.Minute,
-		})
-		if timeout {
-			return ctx.SendX("Prompt timed out.")
+		var minor bool
+		if strings.EqualFold(ctx.RawArgs, "minor") {
+			minor = true
+		} else if strings.EqualFold(ctx.RawArgs, "adult") {
+			minor = false
+		} else {
+			var timeout bool
+
+			minor, timeout = ctx.ConfirmButton(ctx.Author.ID, bcr.ConfirmData{
+				Message:   "Is the new member a bodily minor or an adult?",
+				YesPrompt: "Minor",
+				YesStyle:  discord.PrimaryButtonStyle(),
+				NoPrompt:  "Adult",
+				NoStyle:   discord.PrimaryButtonStyle(),
+				Timeout:   2 * time.Minute,
+			})
+			if timeout {
+				return ctx.SendX("Prompt timed out.")
+			}
 		}
 
 		if minor {

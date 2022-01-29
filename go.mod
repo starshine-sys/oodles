@@ -21,7 +21,7 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20211023115951-9f02b1e13857
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.21.1-0.20211220235955-51d5e27d6e5e
+	github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b
 	github.com/starshine-sys/dischtml v0.1.0
 	github.com/starshine-sys/pkgo/v2 v2.0.1
 	go.uber.org/zap v1.16.0

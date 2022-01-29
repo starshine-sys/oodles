@@ -58,6 +58,16 @@ func Init(bot *bot.Bot) {
 	})
 
 	b.Router.AddCommand(&bcr.Command{
+		Name:              "open",
+		Aliases:           []string{"create"},
+		Summary:           "Open an application for the given user",
+		Usage:             "<user>",
+		Args:              bcr.MinArgs(1),
+		CustomPermissions: b.Checker,
+		Command:           b.fallbackCreate,
+	})
+
+	b.Router.AddCommand(&bcr.Command{
 		Name:              "logs",
 		Summary:           "Show application logs for the given user",
 		Usage:             "<user>",
