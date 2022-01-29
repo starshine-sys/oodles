@@ -21,4 +21,5 @@ var DefaultPermissions = map[string]PermissionLevel{
 	"open":        HelperLevel,
 	"hello":       EveryoneLevel,
 	"valid":       EveryoneLevel,
+	"transcript":  StaffLevel,
 }

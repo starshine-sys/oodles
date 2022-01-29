@@ -114,6 +114,15 @@ func Init(bot *bot.Bot) {
 		Command:           b.overrideCmdPerms,
 	})
 
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "transcript",
+		Summary:           "Save a transcript of the current channel to the given channel",
+		Usage:             "<channel to save transcript in> [limit]",
+		Args:              bcr.MinArgs(1),
+		CustomPermissions: b.Checker,
+		Command:           b.transcript,
+	})
+
 	// add other commands
 	appCommands(b)
 }
