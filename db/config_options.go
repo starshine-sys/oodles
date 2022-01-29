@@ -138,4 +138,14 @@ var ConfigOptions = map[string]ConfigOption{
 		Type:         SnowflakeOptionType,
 		DefaultValue: 0,
 	},
+	"username_role_log": {
+		Description:  "The channel to log name and role changes in.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
+	"message_log": {
+		Description:  "The channel to log message updates and deletes in.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
 }
