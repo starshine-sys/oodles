@@ -119,10 +119,12 @@ func (bot *Bot) levelCmd(ctx *bcr.Context) (err error) {
 	clr := uc.Colour
 	avatarURL := u.AvatarURLWithType(discord.PNGImage) + "?size=256"
 	username := u.Username
-	if clr == 0 && ctx.Guild != nil {
+	if ctx.Guild != nil {
 		m, err := ctx.State.Member(ctx.Guild.ID, u.ID)
 		if err == nil {
-			clr = discord.MemberColor(*ctx.Guild, *m)
+			if clr == 0 {
+				clr = discord.MemberColor(*ctx.Guild, *m)
+			}
 			if m.Avatar != "" {
 				avatarURL = m.AvatarURLWithType(discord.PNGImage, ctx.Message.GuildID) + "?size=256"
 			}
