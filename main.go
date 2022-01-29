@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -75,6 +76,12 @@ func main() {
 
 	common.Log.Info("Connected to Discord. Press Ctrl-C or send an interrupt signal to stop.")
 	common.Log.Infof("User: %v (%v)", botUser.Tag(), botUser.ID)
+
+	b.Router.Prefixes = []string{
+		b.DB.Config.Get("prefix").ToString(),
+		fmt.Sprintf("<@!%v>", botUser.ID),
+		fmt.Sprintf("<@%v>", botUser.ID),
+	}
 
 	// alert in log if we don't receive a guild create event in time
 	time.AfterFunc(5*time.Second, b.CheckIfReady)

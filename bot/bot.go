@@ -49,10 +49,7 @@ func New(conf common.BotConfig) (b *Bot, err error) {
 	}
 	b.Bot = bot.NewWithRouter(r)
 
-	b.Router.Prefixes = []string{b.DB.Config.Get("prefix").ToString()}
-
 	b.Router.EmbedColor = Colour
-	b.Router.Prefixer = b.DB.Prefixer
 
 	b.Router.AddHandler(b.Router.MessageCreate)
 	b.Router.AddHandler(b.Router.InteractionCreate)
