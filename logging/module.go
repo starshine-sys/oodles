@@ -39,6 +39,7 @@ func Init(bot *bot.Bot) {
 	// actual logging
 	b.Router.AddHandler(b.guildMemberAdd)
 	b.Router.AddHandler(b.guildMemberRemove)
+	b.Router.AddHandler(b.guildMemberUpdate)
 	b.Router.AddHandler(b.messageCreate)
 	b.Router.AddHandler(b.messageUpdate)
 	b.Router.AddHandler(b.messageDelete)
