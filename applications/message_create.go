@@ -13,6 +13,10 @@ import (
 )
 
 func (bot *Bot) messageCreate(m *gateway.MessageCreateEvent) {
+	if m.GuildID != bot.DB.BotConfig.GuildID {
+		return
+	}
+
 	app, err := bot.DB.ChannelApplication(m.ChannelID)
 	if err != nil {
 		if err == pgx.ErrNoRows {

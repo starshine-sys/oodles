@@ -17,6 +17,10 @@ import (
 const waitTime = 2 * time.Second
 
 func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
+	if ev.GuildID != bot.DB.BotConfig.GuildID {
+		return
+	}
+
 	data, ok := ev.Data.(*discord.ButtonInteraction)
 	if !ok {
 		return

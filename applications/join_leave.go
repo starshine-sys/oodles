@@ -10,8 +10,8 @@ import (
 )
 
 func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
-	// don't announce bots joining
-	if m.User.Bot {
+	// don't announce bots joining, and don't announce anything from outside the bot guild
+	if m.User.Bot || m.GuildID != bot.DB.BotConfig.GuildID {
 		return
 	}
 
@@ -29,6 +29,10 @@ func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
 }
 
 func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
+	if ev.User.Bot || ev.GuildID != bot.DB.BotConfig.GuildID {
+		return
+	}
+
 	app, err := bot.DB.UserApplication(ev.User.ID)
 	if err != nil {
 		// no app

@@ -15,7 +15,7 @@ import (
 var editPrefixes = []string{"pk;edit", "pk!edit", "pk;e ", "pk!e "}
 
 func (bot *Bot) messageDelete(m *gateway.MessageDeleteEvent) {
-	if !m.GuildID.IsValid() {
+	if m.GuildID != bot.DB.BotConfig.GuildID {
 		return
 	}
 

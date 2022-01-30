@@ -57,10 +57,12 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 				v = v[:1000] + "..."
 			}
 
-			e.Fields = append(e.Fields, discord.EmbedField{
-				Name:  "Roles",
-				Value: v,
-			})
+			if strings.TrimSpace(v) != "" {
+				e.Fields = append(e.Fields, discord.EmbedField{
+					Name:  "Roles",
+					Value: v,
+				})
+			}
 		}
 	}
 
