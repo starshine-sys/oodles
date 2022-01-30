@@ -44,7 +44,7 @@ func main() {
 			continue
 		}
 
-		_, err = tx.Exec(ctx, "update levels set background = (select id from backgrounds where name ilike $1) where user_id = $2", level.Background, level.UserID)
+		_, err = tx.Exec(ctx, "update levels set background = (select id from level_backgrounds where name ilike $1) where user_id = $2", level.Background, level.UserID)
 		if err != nil {
 			log.Printf("error updating background for %v: %v", level.UserID, err)
 			err = tx.Rollback(ctx)
