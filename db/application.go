@@ -78,7 +78,7 @@ func (db *DB) CloseApplication(id xid.ID) error {
 
 // CreateApplication ...
 func (db *DB) CreateApplication(userID discord.UserID, chID discord.ChannelID) (a Application, err error) {
-	pgxscan.Get(context.Background(), db, &a, "insert into applications (id, user_id, channel_id) values ($1, $2, $3) returning *", xid.New(), userID, chID)
+	err = pgxscan.Get(context.Background(), db, &a, "insert into applications (id, user_id, channel_id) values ($1, $2, $3) returning *", xid.New(), userID, chID)
 	return a, err
 }
 
