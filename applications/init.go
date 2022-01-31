@@ -1,6 +1,7 @@
 package applications
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -9,6 +10,8 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/utils/json/option"
+	"github.com/dustin/go-humanize/english"
 	"github.com/jackc/pgx/v4"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/db"
@@ -31,10 +34,19 @@ func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
 		if err != nil {
 			common.Log.Errorf("Error in open application interaction: %v", err)
 		}
+		return
+	}
+
+	if data.CustomID == "restart-app" {
+		err := bot.restartAppInteraction(ev, data)
+		if err != nil {
+			common.Log.Errorf("Error in restart application: %v", err)
+		}
+		return
 	}
 
 	if strings.HasPrefix(string(data.CustomID), "app-track:") {
-		err := bot.chooseAppTrack(ev, data)
+		err := bot.chooseAppTrack(ev, data, strings.HasSuffix(string(data.CustomID), ":restart"))
 		if err != nil {
 			common.Log.Errorf("Error in choose app track: %v", err)
 		}
@@ -111,7 +123,7 @@ func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discor
 	return
 }
 
-func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction) (err error) {
+func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction, isRestart bool) (err error) {
 	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
 
 	if ev.Member == nil {
@@ -157,7 +169,10 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 		return bot.respond(ev, "You're not the user who this application is for.")
 	}
 
-	trackID, err := strconv.ParseInt(strings.TrimPrefix(string(data.CustomID), "app-track:"), 10, 10)
+	ids := strings.TrimSuffix(
+		strings.TrimPrefix(string(data.CustomID), "app-track:"), ":restart",
+	)
+	trackID, err := strconv.ParseInt(ids, 10, 10)
 	if err != nil {
 		return err
 	}
@@ -169,15 +184,28 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 
 	// we have a track, so finish this interaction
 	components := ev.Message.Components
+	hasRestartButton := false
 	for _, c := range components {
 		v, ok := c.(*discord.ActionRowComponent)
 		if ok {
 			for i := range *v {
 				btn, ok := (*v)[i].(*discord.ButtonComponent)
 				if ok {
-					btn.Disabled = true
-					(*v)[i] = btn
+					if btn.CustomID != "restart-app" {
+						btn.Disabled = true
+						(*v)[i] = btn
+					} else {
+						hasRestartButton = true
+					}
 				}
+			}
+
+			if !hasRestartButton && !isRestart {
+				*v = append(*v, &discord.ButtonComponent{
+					Label:    "Restart",
+					Style:    discord.SecondaryButtonStyle(),
+					CustomID: "restart-app",
+				})
 			}
 		}
 	}
@@ -197,6 +225,11 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 		bot.SendError("Error setting application track in %v: %v", app.ChannelID.Mention(), err)
 		_, err = s.SendMessage(app.ChannelID, "Something went wrong! Please ask a mod for assistance.")
 		return
+	}
+
+	_, err = s.SendMessage(app.ChannelID, fmt.Sprintf("Starting **%v** application!\nIf you picked the wrong type, or wanna restart your application for any other reason, please press the \"restart\" button above!", track.Name))
+	if err != nil {
+		bot.SendError("error sending message: %v", err)
 	}
 
 	qs, err := bot.DB.Questions(track.ID)
@@ -223,6 +256,69 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 	}
 
 	return
+}
+
+func (bot *Bot) restartAppInteraction(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction) error {
+	if ev.Member == nil {
+		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+	}
+
+	if ev.Message == nil {
+		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+	}
+
+	app, err := bot.DB.ChannelApplication(ev.ChannelID)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return bot.respond(ev, "This channel isn't an application channel!")
+		}
+		return err
+	}
+
+	if app.UserID != ev.Member.User.ID {
+		return bot.respond(ev, "You're not the user who this application is for.")
+	}
+
+	err = bot.DB.ResetApplication(app.ID)
+	if err != nil {
+		bot.SendError("Error resetting application %v: %v", app.ID, err)
+		return bot.respond(ev, "Internal error occurred! Please ping staff for assistance.")
+	}
+
+	tracks, err := bot.DB.ApplicationTracks()
+	if err != nil {
+		bot.SendError("Error getting app tracks: %v", err)
+		return bot.respond(ev, "Internal error occurred! Please ping staff for assistance.")
+	}
+
+	str := "Are you "
+
+	var descs []string
+	var buttons discord.ActionRowComponent
+
+	for _, t := range tracks {
+		descs = append(descs, fmt.Sprintf("%v (%s)", t.Description, t.Emoji()))
+		buttons = append(buttons, &discord.ButtonComponent{
+			Label:    t.Name,
+			CustomID: discord.ComponentID("app-track:" + strconv.FormatInt(t.ID, 10) + ":restart"),
+			Style:    discord.SecondaryButtonStyle(),
+			Emoji: &discord.ComponentEmoji{
+				Name:     t.Emoji().Name,
+				ID:       t.Emoji().ID,
+				Animated: t.Emoji().Animated,
+			},
+		})
+	}
+	str += english.OxfordWordSeries(descs, "or") + "?"
+
+	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
+	return s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+		Type: api.MessageInteractionWithSource,
+		Data: &api.InteractionResponseData{
+			Content:    option.NewNullableString(str),
+			Components: &discord.ContainerComponents{&buttons},
+		},
+	})
 }
 
 func (bot *Bot) sendInterviewMessage(app *db.Application, msg string) error {

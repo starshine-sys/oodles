@@ -34,7 +34,7 @@ func (bot *Bot) restart(ctx *bcr.Context) (err error) {
 		descs = append(descs, fmt.Sprintf("%v (%s)", t.Description, t.Emoji()))
 		buttons = append(buttons, &discord.ButtonComponent{
 			Label:    t.Name,
-			CustomID: discord.ComponentID("app-track:" + strconv.FormatInt(t.ID, 10)),
+			CustomID: discord.ComponentID("app-track:" + strconv.FormatInt(t.ID, 10) + ":restart"),
 			Style:    discord.SecondaryButtonStyle(),
 			Emoji: &discord.ComponentEmoji{
 				Name:     t.Emoji().Name,
