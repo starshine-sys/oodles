@@ -124,6 +124,8 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 				common.Log.Errorf("Error sending message: %v", err)
 			}
 		}
+	} else {
+		_ = ctx.SendfX("Remember to kick them with Carl using the following command:\n`!kick %v %v`", app.UserID, reason)
 	}
 
 	app.Verified = &denied
@@ -132,6 +134,13 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 	err = bot.DB.SetVerified(app.ID, ctx.Author.ID, false, &reason)
 	if err != nil {
 		bot.SendError("Error setting application %v to denied: %v\nMod: %v/verified: false/reason: %v", app.ID, err, ctx.Author.ID, reason)
+	}
+
+	if app.ScheduledEventID != nil {
+		err = bot.Scheduler.Remove(*app.ScheduledEventID)
+		if err != nil {
+			bot.SendError("Error removing schedled timeout message for app %v: %v", app.ID, err)
+		}
 	}
 
 	_, err = bot.createTranscript(ctx.State, app)

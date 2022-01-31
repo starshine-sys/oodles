@@ -64,6 +64,13 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 		common.Log.Errorf("Error updating channel title: %v", err)
 	}
 
+	if app.ScheduledEventID != nil {
+		err = bot.Scheduler.Remove(*app.ScheduledEventID)
+		if err != nil {
+			bot.SendError("Error removing schedled timeout message for app %v: %v", app.ID, err)
+		}
+	}
+
 	_, err = bot.createTranscript(s, app)
 	if common.IsOodlesError(err) {
 		_, err = s.SendMessage(app.ChannelID, fmt.Sprintf("❌ %v", err))

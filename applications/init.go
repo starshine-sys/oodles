@@ -82,7 +82,7 @@ func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discor
 		return
 	}
 
-	err = bot.DB.CreateApplication(ev.Member.User.ID, ch.ID)
+	app, err := bot.DB.CreateApplication(ev.Member.User.ID, ch.ID)
 	if err != nil {
 		bot.SendError("Error registering application in DB: %v", err)
 		_, err = bot.updateResponse(ev, "I couldn't save the newly opened application!")
@@ -94,6 +94,17 @@ func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discor
 		bot.SendError("Error sending initial message: %v", err)
 		_, err = bot.updateResponse(ev, "I couldn't send the initial message!")
 		return
+	}
+
+	eventID, err := bot.Scheduler.Add(
+		time.Now().Add(24*time.Hour), &timeout{ChannelID: ch.ID, UserID: ev.Member.User.ID},
+	)
+	if err == nil {
+		if err := bot.DB.SetEventID(app.ID, eventID); err != nil {
+			common.Log.Errorf("error setting event id for app %v: %v", app.ID, err)
+		}
+	} else {
+		common.Log.Errorf("error adding timeout event for app %v: %v", app.ID, err)
 	}
 
 	_, err = bot.updateResponse(ev, "Application opened in %v!", ch.Mention())

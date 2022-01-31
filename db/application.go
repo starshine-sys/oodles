@@ -36,6 +36,9 @@ type Application struct {
 
 	TranscriptChannel *discord.ChannelID
 	TranscriptMessage *discord.MessageID
+
+	// The scheduled event used to notify when the app times out
+	ScheduledEventID *int64
 }
 
 // AllUserApplications returns all of this user's applications, sorted by ID descending.
@@ -74,9 +77,9 @@ func (db *DB) CloseApplication(id xid.ID) error {
 }
 
 // CreateApplication ...
-func (db *DB) CreateApplication(userID discord.UserID, chID discord.ChannelID) error {
-	_, err := db.Exec(context.Background(), "insert into applications (id, user_id, channel_id) values ($1, $2, $3)", xid.New(), userID, chID)
-	return err
+func (db *DB) CreateApplication(userID discord.UserID, chID discord.ChannelID) (a Application, err error) {
+	pgxscan.Get(context.Background(), db, &a, "insert into applications (id, user_id, channel_id) values ($1, $2, $3) returning *", xid.New(), userID, chID)
+	return a, err
 }
 
 // SetTrack ...
@@ -105,6 +108,11 @@ func (db *DB) CompleteApp(appID xid.ID) error {
 // SetTranscript ...
 func (db *DB) SetTranscript(appID xid.ID, chID discord.ChannelID, msgID discord.MessageID) error {
 	_, err := db.Exec(context.Background(), "update applications set transcript_channel = $1, transcript_message = $2 where id = $3", chID, msgID, appID)
+	return err
+}
+
+func (db *DB) SetEventID(appID xid.ID, eventID int64) error {
+	_, err := db.Exec(context.Background(), "update applications set scheduled_event_id = $1 where id = $2", eventID, appID)
 	return err
 }
 

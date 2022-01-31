@@ -1,8 +1,11 @@
 package applications
 
 import (
+	"time"
+
 	"github.com/jackc/pgx/v4"
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/oodles/common"
 )
 
 func (bot *Bot) fallbackCreate(ctx *bcr.Context) (err error) {
@@ -36,7 +39,7 @@ func (bot *Bot) fallbackCreate(ctx *bcr.Context) (err error) {
 		return ctx.SendX("I couldn't create an application channel!")
 	}
 
-	err = bot.DB.CreateApplication(m.User.ID, ch.ID)
+	app, err := bot.DB.CreateApplication(m.User.ID, ch.ID)
 	if err != nil {
 		bot.SendError("Error registering application in DB: %v", err)
 		return ctx.SendX("I couldn't save the newly opened application!")
@@ -46,6 +49,17 @@ func (bot *Bot) fallbackCreate(ctx *bcr.Context) (err error) {
 	if err != nil {
 		bot.SendError("Error sending initial message: %v", err)
 		return ctx.SendX("I couldn't send the initial message!")
+	}
+
+	eventID, err := bot.Scheduler.Add(
+		time.Now().Add(24*time.Hour), &timeout{ChannelID: ch.ID, UserID: m.User.ID},
+	)
+	if err == nil {
+		if err := bot.DB.SetEventID(app.ID, eventID); err != nil {
+			common.Log.Errorf("error setting event id for app %v: %v", app.ID, err)
+		}
+	} else {
+		common.Log.Errorf("error adding timeout event for app %v: %v", app.ID, err)
 	}
 
 	return ctx.SendfX("Application opened in %v!", ch.Mention())

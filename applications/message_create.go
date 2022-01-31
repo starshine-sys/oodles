@@ -49,6 +49,13 @@ func (bot *Bot) messageCreate(m *gateway.MessageCreateEvent) {
 	}
 
 	if len(qs) <= app.Question {
+		if app.ScheduledEventID != nil {
+			err = bot.Scheduler.Remove(*app.ScheduledEventID)
+			if err != nil {
+				bot.SendError("Error removing schedled timeout message for app %v: %v", app.ID, err)
+			}
+		}
+
 		err = bot.completeApp(app, m)
 		if err != nil {
 			bot.SendError("Error completing app %v: %v", app.ID, err)
@@ -79,6 +86,13 @@ func (bot *Bot) messageCreate(m *gateway.MessageCreateEvent) {
 	err = bot.DB.SetQuestionIndex(app.ID, app.Question+1)
 	if err != nil {
 		bot.SendError("Error incrementing question index for app %v: %v", app.ID, err)
+	}
+
+	if app.ScheduledEventID != nil {
+		err = bot.Scheduler.Reschedule(*app.ScheduledEventID, 24*time.Hour)
+		if err != nil {
+			bot.SendError("Error removing schedled timeout message for app %v: %v", app.ID, err)
+		}
 	}
 }
 

@@ -19,9 +19,10 @@ type Bot struct {
 
 	Colour discord.Color
 
-	DB      *db.DB
-	Checker *Checker
-	PK      *pkgo.Session
+	DB        *db.DB
+	Scheduler *Scheduler
+	Checker   *Checker
+	PK        *pkgo.Session
 }
 
 // Colour is the embed colour used throughout the bot
@@ -48,6 +49,7 @@ func New(conf common.BotConfig) (b *Bot, err error) {
 		return nil, err
 	}
 	b.Bot = bot.NewWithRouter(r)
+	b.Scheduler = NewScheduler(b)
 
 	b.Router.EmbedColor = Colour
 

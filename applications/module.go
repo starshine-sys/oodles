@@ -25,6 +25,8 @@ type Bot struct {
 func Init(bot *bot.Bot) {
 	b := &Bot{bot, sync.RWMutex{}, make(map[discord.UserID]struct{})}
 
+	b.Scheduler.AddType(&timeout{})
+
 	b.Router.AddHandler(b.interactionCreate)
 	b.Router.AddHandler(b.messageCreate)
 	b.Router.AddHandler(b.guildMemberAdd)

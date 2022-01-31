@@ -137,6 +137,13 @@ func (bot *Bot) verify(ctx *bcr.Context) (err error) {
 		return ctx.SendfX("Couldn't get this channel's category.")
 	}
 
+	if app.ScheduledEventID != nil {
+		err = bot.Scheduler.Remove(*app.ScheduledEventID)
+		if err != nil {
+			bot.SendError("Error removing schedled timeout message for app %v: %v", app.ID, err)
+		}
+	}
+
 	return ctx.State.ModifyChannel(app.ChannelID, api.ModifyChannelData{
 		Name:           "🔒-app-" + unidecode.Unidecode(m.User.Username),
 		Overwrites:     &cat.Overwrites,

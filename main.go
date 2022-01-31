@@ -83,6 +83,9 @@ func main() {
 		fmt.Sprintf("<@%v>", botUser.ID),
 	}
 
+	// start scheduler
+	go b.Scheduler.Start()
+
 	// alert in log if we don't receive a guild create event in time
 	time.AfterFunc(5*time.Second, b.CheckIfReady)
 
