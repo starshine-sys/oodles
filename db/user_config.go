@@ -15,7 +15,7 @@ func (db *DB) ensureUserConfigExists(ctx context.Context, userID discord.UserID)
 func (db *DB) UserStringSet(userID discord.UserID, key, val string) error {
 	db.ensureUserConfigExists(context.Background(), userID)
 
-	_, err := db.Exec(context.Background(), "update users set config = config || hstore(array[$1, $2::text]) where id = $3", key, val, userID)
+	_, err := db.Exec(context.Background(), "update users set config = coalesce(config, ''::hstore) || hstore($1, $2) where id = $3", key, val, userID)
 	return err
 }
 
