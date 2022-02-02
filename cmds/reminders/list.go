@@ -65,7 +65,7 @@ func (bot *Bot) reminders(ctx *bcr.Context) (err error) {
 `, r.ID, text, r.Expires.Unix(), linkGuild, r.ChannelID, r.MessageID))
 	}
 
-	embeds := bcr.StringPaginator(fmt.Sprintf("%v (%v)", title, len(rms)), bcr.ColourBlurple, slice, 5)
+	embeds := bcr.StringPaginator(fmt.Sprintf("%v (%v)", title, len(rms)), bot.Colour, slice, 5)
 
 	_, _, err = ctx.ButtonPages(embeds, 10*time.Minute)
 	return

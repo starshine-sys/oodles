@@ -8,7 +8,6 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/common"
 )
 
@@ -119,7 +118,7 @@ func (bot *Bot) messageCreate(m *gateway.MessageCreateEvent) {
 					Value: fmt.Sprintf("https://discord.com/channels/%v/%v/%v", m.GuildID, m.ChannelID, m.ID),
 				},
 			},
-			Color: bcr.ColourBlurple,
+			Color: bot.Colour,
 		}
 
 		_, err = s.SendEmbeds(sc.RewardLog, e)

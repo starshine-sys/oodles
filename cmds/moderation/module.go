@@ -72,6 +72,25 @@ func Init(b *bot.Bot) {
 		CustomPermissions: bot.Checker,
 		Command:           bot.unban,
 	})
+
+	modlogs := bot.Router.AddCommand(&bcr.Command{
+		Name:              "modlogs",
+		Aliases:           []string{"modlog"},
+		Summary:           "Show a user's moderation history",
+		Usage:             "<user>",
+		Args:              bcr.MinArgs(1),
+		CustomPermissions: bot.Checker,
+		Command:           bot.modlogs,
+	})
+
+	modlogs.AddSubcommand(&bcr.Command{
+		Name:              "import",
+		Summary:           "Import a mod log from Carl-bot",
+		OwnerOnly:         true,
+		Hidden:            true,
+		CustomPermissions: bot.Checker,
+		Command:           bot.importCmd,
+	})
 }
 
 // aboveUser returns true if mod is above member in the role hierarchy.

@@ -94,3 +94,8 @@ func (db *DB) UpdateModLogMessage(id int64, chID discord.ChannelID, msgID discor
 	err = pgxscan.Get(context.Background(), db, &e, "update mod_log set channel_id = $1, message_id = $2 where id = $3 returning *", chID, msgID, id)
 	return e, errors.Cause(err)
 }
+
+func (db *DB) ModLogFor(guildID discord.GuildID, userID discord.UserID) (es []ModLogEntry, err error) {
+	err = pgxscan.Select(context.Background(), db, &es, "select * from mod_log where guild_id = $1 and user_id = $2 order by time desc", guildID, userID)
+	return es, errors.Cause(err)
+}
