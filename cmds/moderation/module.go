@@ -48,6 +48,30 @@ func Init(b *bot.Bot) {
 		CustomPermissions: bot.Checker,
 		Command:           bot.unmute,
 	})
+
+	bot.Router.AddCommand(&bcr.Command{
+		Name:              "ban",
+		Summary:           "Ban a user",
+		Usage:             "<user> [reason]",
+		CustomPermissions: bot.Checker,
+		Command:           bot.ban,
+	})
+
+	bot.Router.AddCommand(&bcr.Command{
+		Name:              "kick",
+		Summary:           "Kick a user",
+		Usage:             "<user> [reason]",
+		CustomPermissions: bot.Checker,
+		Command:           bot.kick,
+	})
+
+	bot.Router.AddCommand(&bcr.Command{
+		Name:              "unban",
+		Summary:           "Unban a user",
+		Usage:             "<user> [reason]",
+		CustomPermissions: bot.Checker,
+		Command:           bot.unban,
+	})
 }
 
 // aboveUser returns true if mod is above member in the role hierarchy.

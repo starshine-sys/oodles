@@ -5,17 +5,22 @@ import (
 	"fmt"
 
 	"1f320.xyz/x/parameters"
-	"github.com/dustin/go-humanize"
+	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/db"
 )
 
-func (bot *Bot) warn(ctx *bcr.Context) (err error) {
+func (bot *Bot) kick(ctx *bcr.Context) (err error) {
+	muteRole := bot.DB.Config.Get("mute_role").ToRoleID()
+	if !muteRole.IsValid() {
+		return ctx.SendX("There's no mute role set, so we can't mute members.")
+	}
+
 	params := parameters.NewParameters(ctx.RawArgs, false)
 
 	if !params.HasNext() {
-		return ctx.SendX("You must give a user to warn.")
+		return ctx.SendX("You must give a user to kick.")
 	}
 
 	u, err := ctx.ParseMember(params.Pop())
@@ -23,12 +28,6 @@ func (bot *Bot) warn(ctx *bcr.Context) (err error) {
 		_, err = ctx.Send("User not found.")
 		return
 	}
-
-	if !params.HasNext() {
-		return ctx.SendX("You must give a reason.")
-	}
-
-	reason := params.Remainder(false)
 
 	if u.User.ID == ctx.Bot.ID {
 		return ctx.SendX("No.")
@@ -39,15 +38,37 @@ func (bot *Bot) warn(ctx *bcr.Context) (err error) {
 		return
 	}
 
+	reason := "No reason given."
+	if params.HasNext() {
+		reason = params.Remainder(false)
+	}
+
+	auditLogReason := reason
+	if len(reason) > 400 {
+		auditLogReason = reason[:400] + "..."
+	}
+
 	entry, err := bot.DB.InsertModLog(context.Background(), db.ModLogEntry{
 		GuildID:    ctx.Message.GuildID,
 		UserID:     u.User.ID,
 		ModID:      ctx.Author.ID,
-		ActionType: "warn",
+		ActionType: "kick",
 		Reason:     reason,
 	})
 	if err != nil {
 		return bot.Report(ctx, err)
+	}
+
+	_, _ = ctx.NewDM(u.User.ID).Content(
+		fmt.Sprintf("You were kicked from %v.\nReason: %v", ctx.Guild.Name, reason),
+	).Send()
+
+	err = ctx.State.Kick(ctx.Message.GuildID, u.User.ID, api.AuditLogReason(fmt.Sprintf(
+		"%v (%v): %v", ctx.Author.Tag(), ctx.Author.ID, auditLogReason,
+	)))
+	if err != nil {
+		bot.SendError("error kicking user %v: %v", u.User.Tag(), err)
+		return ctx.SendfX("We were unable to kick %v!", u.User.Tag())
 	}
 
 	logCh := bot.DB.Config.Get("mod_log").ToChannelID()
@@ -66,18 +87,5 @@ func (bot *Bot) warn(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	_, err = ctx.NewDM(u.User.ID).Content(fmt.Sprintf("You were warned in %v.\nReason: %v", ctx.Guild.Name, reason)).Send()
-	if err != nil {
-		_, err = ctx.Sendf("The warning was logged, but we were unable to DM %v about their warning!", u.User.Tag())
-		return
-	}
-
-	var count int
-	err = bot.DB.Pool.QueryRow(context.Background(), "select count(*) from mod_log where user_id = $1 and guild_id = $2 and action_type = 'warn'", u.User.ID, ctx.Message.GuildID).Scan(&count)
-	if err != nil {
-		count = 1
-	}
-
-	_, err = ctx.NewMessage().Content(fmt.Sprintf("**%v** has been warned, this is their %v warning.", u.User.Tag(), humanize.Ordinal(count))).Send()
-	return
+	return ctx.SendfX("Kicked **%v**", u.User.Tag())
 }

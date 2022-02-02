@@ -53,8 +53,7 @@ func (bot *Bot) mute(ctx *bcr.Context) (err error) {
 	}
 
 	if u.User.ID == ctx.Bot.ID {
-		_, err = ctx.Send("Why would you do that?")
-		return
+		return ctx.SendX("No.")
 	}
 
 	if !bot.aboveUser(ctx, ctx.Member, u) {

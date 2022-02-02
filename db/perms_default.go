@@ -29,4 +29,5 @@ var DefaultPermissions = map[string]PermissionLevel{
 	"unmute":      HelperLevel,
 	"kick":        StaffLevel,
 	"ban":         StaffLevel,
+	"unban":       StaffLevel,
 }
