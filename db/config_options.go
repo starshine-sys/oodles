@@ -148,4 +148,16 @@ var ConfigOptions = map[string]ConfigOption{
 		Type:         SnowflakeOptionType,
 		DefaultValue: 0,
 	},
+
+	// Moderation related
+	"mod_log": {
+		Description:  "The channel to log moderator actions in.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
+	"mute_role": {
+		Description:  "The role to give to people with the `{prefix}mute` command.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
 }

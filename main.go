@@ -15,6 +15,7 @@ import (
 	"github.com/starshine-sys/oodles/cmds/fun"
 	"github.com/starshine-sys/oodles/cmds/listings"
 	"github.com/starshine-sys/oodles/cmds/meta"
+	"github.com/starshine-sys/oodles/cmds/moderation"
 	"github.com/starshine-sys/oodles/cmds/reminders"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/levels"
@@ -57,6 +58,7 @@ func main() {
 	listings.Init(b)
 	logging.Init(b)
 	fun.Init(b)
+	moderation.Init(b)
 	reminders.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)

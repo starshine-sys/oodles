@@ -23,4 +23,10 @@ var DefaultPermissions = map[string]PermissionLevel{
 	"valid":       EveryoneLevel,
 	"transcript":  StaffLevel,
 	"remindme":    EveryoneLevel,
+	"warn":        HelperLevel,
+	"mute":        HelperLevel,
+	"hardmute":    HelperLevel,
+	"unmute":      HelperLevel,
+	"kick":        StaffLevel,
+	"ban":         StaffLevel,
 }
