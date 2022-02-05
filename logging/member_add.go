@@ -115,7 +115,7 @@ func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
 				if g.VanityURLCode != "" {
 					e.Fields = append(e.Fields, discord.EmbedField{
 						Name:  "Invite used",
-						Value: "Vanity invite (" + bcr.EscapeBackticks(g.VanityURLCode) + ")",
+						Value: "Vanity invite (" + bcr.AsCode(g.VanityURLCode) + ")",
 					})
 				} else {
 					e.Fields = append(e.Fields, discord.EmbedField{

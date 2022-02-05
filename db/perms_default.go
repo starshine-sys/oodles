@@ -31,4 +31,5 @@ var DefaultPermissions = map[string]PermissionLevel{
 	"ban":         StaffLevel,
 	"unban":       StaffLevel,
 	"modlogs":     HelperLevel,
+	"stats":       HelperLevel,
 }

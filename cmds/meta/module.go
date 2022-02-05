@@ -1,6 +1,8 @@
 package meta
 
 import (
+	"time"
+
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/bot"
@@ -9,11 +11,30 @@ import (
 // Bot ...
 type Bot struct {
 	*bot.Bot
+
+	Uptime time.Time
+
+	messagesSeen                  int64
+	mentions                      int64
+	timesEWasUsed                 int64
+	timesSomeoneWithNInNameTalked int64
 }
 
 // Init ...
 func Init(bot *bot.Bot) {
-	b := &Bot{bot}
+	b := &Bot{
+		Bot:    bot,
+		Uptime: time.Now().UTC(),
+	}
+
+	b.Router.AddHandler(b.pointlessStats)
+
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "stats",
+		Summary:           "Show a couple of useless statistics",
+		CustomPermissions: b.Checker,
+		Command:           b.stats,
+	})
 
 	b.Router.AddCommand(&bcr.Command{
 		Name:              "ping",
