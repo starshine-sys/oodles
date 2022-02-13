@@ -49,7 +49,7 @@ func (bot *Bot) guildMemberUpdate(ev *gateway.GuildMemberUpdateEvent) {
 		return
 	}
 
-	if m.Nick != ev.Nick || m.User.Username+"#"+m.User.Discriminator != ev.User.Username+"#"+ev.User.Discriminator || m.User.Avatar != ev.User.Avatar {
+	if m.Nick != ev.Nick || m.User.Tag() != ev.User.Tag() {
 		// username or nickname changed, so run that handler
 		bot.guildMemberNickUpdate(ev, m)
 		return
@@ -161,23 +161,11 @@ func (bot *Bot) guildMemberNickUpdate(ev *gateway.GuildMemberUpdateEvent, m disc
 	}
 
 	if oldNick == newNick {
-		oldNick = m.User.Username + "#" + m.User.Discriminator
-		newNick = ev.User.Username + "#" + ev.User.Discriminator
+		oldNick = m.User.Tag()
+		newNick = ev.User.Tag()
 	}
 
 	e.Description = fmt.Sprintf("**Before:** %v\n**After:** %v", oldNick, newNick)
-
-	if m.User.Avatar != ev.User.Avatar {
-		if oldNick == newNick {
-			e.Title = ""
-			e.Description = ""
-		}
-
-		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:  "Avatar updated",
-			Value: fmt.Sprintf("[Before](%v) (link will only work as long as the avatar is cached)\n[After](%v)", m.User.AvatarURL()+"?size=1024", ev.User.AvatarURL()+"?size=1024"),
-		})
-	}
 
 	s, _ := bot.Router.StateFromGuildID(ev.GuildID)
 

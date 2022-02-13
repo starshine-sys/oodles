@@ -65,7 +65,7 @@ func (bot *Bot) messageUpdate(m *gateway.MessageUpdateEvent) {
 
 	e := discord.Embed{
 		Author: author,
-		Title:  fmt.Sprintf("Message by \"%v#%v\" updated", m.Author.Username, m.Author.Discriminator),
+		Title:  fmt.Sprintf("Message by %v#%v updated", m.Author.Username, m.Author.Discriminator),
 		Color:  bcr.ColourPurple,
 		Footer: &discord.EmbedFooter{
 			Text: fmt.Sprintf("ID: %v", msg.ID),

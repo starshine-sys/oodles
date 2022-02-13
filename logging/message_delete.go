@@ -103,7 +103,7 @@ func (bot *Bot) messageDelete(m *gateway.MessageDeleteEvent) {
 	}
 
 	if msg.Username != "" {
-		e.Title = "Message by \"" + msg.Username + "\" deleted"
+		e.Title = "Message by " + msg.Username + " deleted"
 	}
 
 	value := fmt.Sprintf("%v\nID: %v", msg.ChannelID.Mention(), msg.ChannelID)

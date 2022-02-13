@@ -40,9 +40,8 @@ func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
 
 		Fields: []discord.EmbedField{
 			{
-				Name:   "Account age",
-				Value:  fmt.Sprintf("<t:%v> (%v)", m.User.ID.Time().Unix(), bcr.HumanizeTime(bcr.DurationPrecisionMinutes, m.User.ID.Time())),
-				Inline: true,
+				Name:  "Account age",
+				Value: fmt.Sprintf("<t:%v> (%v)", m.User.ID.Time().Unix(), bcr.HumanizeTime(bcr.DurationPrecisionMinutes, m.User.ID.Time())),
 			},
 		},
 
@@ -59,41 +58,24 @@ func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
 
 	sys, err := bot.PK.Account(pkgo.Snowflake(m.User.ID))
 	if err == nil {
-		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:   "​",
-			Value:  "**PluralKit system information**",
-			Inline: false,
-		})
+		name := sys.Name
+		if sys.Name == "" {
+			sys.Name = "*[none or private]*"
+		}
+		tag := sys.Tag
+		if sys.Tag == "" {
+			sys.Tag = "*[none]*"
+		}
 
-		if sys.Name != "" {
-			e.Fields = append(e.Fields, discord.EmbedField{
-				Name:   "Name",
-				Value:  sys.Name,
-				Inline: true,
-			})
+		str := fmt.Sprintf("**ID:** %v\n**Name:** %v\n**Tag:** %v", sys.ID, name, tag)
+
+		if !sys.Created.IsZero() {
+			str += fmt.Sprintf("\n**Created at:** <t:%v>", sys.Created.Unix())
 		}
 
 		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:   "ID",
-			Value:  sys.ID,
-			Inline: true,
-		})
-
-		tag := "(None)"
-		if sys.Tag != "" {
-			tag = sys.Tag
-		}
-
-		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:   "Tag",
-			Value:  tag,
-			Inline: true,
-		})
-
-		e.Fields = append(e.Fields, discord.EmbedField{
-			Name:   "Created",
-			Value:  fmt.Sprintf("<t:%v>\n%v", sys.Created.Unix(), bcr.HumanizeTime(bcr.DurationPrecisionMinutes, sys.Created)),
-			Inline: false,
+			Name:  "PluralKit information",
+			Value: str,
 		})
 	}
 
@@ -127,32 +109,12 @@ func (bot *Bot) guildMemberAdd(m *gateway.GuildMemberAddEvent) {
 			} else {
 				name := bot.DB.InviteName(inv.Code)
 
-				e.Fields = append(e.Fields, []discord.EmbedField{
-					{
-						Name:  "​",
-						Value: "**Invite information**",
-					},
-					{
-						Name:   "Code",
-						Value:  inv.Code,
-						Inline: true,
-					},
-					{
-						Name:   "Uses",
-						Value:  fmt.Sprint(inv.Uses),
-						Inline: true,
-					},
-					{
-						Name:   "Created at",
-						Value:  fmt.Sprintf("<t:%v>", inv.CreatedAt.Time().Unix()),
-						Inline: true,
-					},
-					{
-						Name:   "Name",
-						Value:  name,
-						Inline: false,
-					},
-				}...)
+				str := fmt.Sprintf("**Code:** %v\n**Uses:** %v\n**Name:** %v", inv.Code, inv.Uses, name)
+
+				e.Fields = append(e.Fields, discord.EmbedField{
+					Name:  "Invite used",
+					Value: str,
+				})
 			}
 
 		} else {
