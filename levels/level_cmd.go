@@ -30,8 +30,11 @@ var blankPixels = []int{96, 96, 96, 96, 85, 85, 85, 85, 74, 74, 74, 74, 68, 68, 
 //go:embed fonts
 var fontData embed.FS
 
-var boldFont font.Face
 var normalFont font.Face
+
+const defaultBoldSize = 60
+
+var montserrat, noto, emoji *truetype.Font
 
 func mustParse(path string) *truetype.Font {
 	b, err := fontData.ReadFile(path)
@@ -48,32 +51,33 @@ func mustParse(path string) *truetype.Font {
 	return f
 }
 
-func init() {
-	// montserrat for most latin letters
-	montserrat := mustParse("fonts/Montserrat-Medium.ttf")
-	// noto as fallback for other characters
-	noto := mustParse("fonts/NotoSans-Medium.ttf")
-	// emoji fallback
-	emoji := mustParse("fonts/NotoEmoji-Regular.ttf")
-
+func boldFontSize(size float64) *multiface.Face {
 	mf := &multiface.Face{}
 
-	// add montserrat font
 	mf.AddTruetypeFace(truetype.NewFace(montserrat, &truetype.Options{
-		Size: 60,
+		Size: size,
 	}), montserrat)
 
 	// add noto font
 	mf.AddTruetypeFace(truetype.NewFace(noto, &truetype.Options{
-		Size: 60,
+		Size: size,
 	}), noto)
 
 	// add noto emoji
 	mf.AddTruetypeFace(truetype.NewFace(emoji, &truetype.Options{
-		Size: 60,
+		Size: size,
 	}), emoji)
 
-	boldFont = mf
+	return mf
+}
+
+func init() {
+	// montserrat for most latin letters
+	montserrat = mustParse("fonts/Montserrat-Medium.ttf")
+	// noto as fallback for other characters
+	noto = mustParse("fonts/NotoSans-Medium.ttf")
+	// emoji fallback
+	emoji = mustParse("fonts/NotoEmoji-Regular.ttf")
 
 	normalFont = truetype.NewFace(
 		mustParse("fonts/Montserrat-Regular.ttf"),
@@ -267,20 +271,29 @@ func (bot *Bot) generateImage(ctx *bcr.Context,
 
 	img.SetHexColor("#ffffff")
 
-	img.SetFontFace(boldFont)
+	currentSize := float64(defaultBoldSize)
+	img.SetFontFace(boldFontSize(currentSize))
 
-	displayName := ""
-	for i, r := range name {
-		if i > 18 {
-			displayName += "..."
+	targetLen := (width - 100) - 350
+	if rank != 0 {
+		targetLen -= 200
+	}
+
+	for currentSize > 1 {
+		w, h := img.MeasureString(name)
+
+		if w < float64(targetLen) {
+			common.Log.Debugf("name %q fits in %v height", name, h)
+
 			break
 		}
 
-		displayName += string(r)
+		currentSize -= 1
+		img.SetFontFace(boldFontSize(currentSize))
 	}
 
 	// name
-	img.DrawStringAnchored(displayName, 350, 120, 0, 0.5)
+	img.DrawStringAnchored(name, 350, 120, 0, 0.5)
 
 	// rank/xp
 	img.SetFontFace(normalFont)
