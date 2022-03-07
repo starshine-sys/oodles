@@ -25,16 +25,25 @@ func Init(bot *bot.Bot) {
 	b.Router.AddCommand(&bcr.Command{
 		Name:              "hello",
 		Aliases:           []string{"hi"},
-		Usage:             "Say hello!",
+		Summary:           "Say hello!",
 		CustomPermissions: b.Checker,
 		Command: func(ctx *bcr.Context) error {
 			return ctx.SendfX("Hello, %v!", ctx.DisplayName())
 		},
 	})
 
+	b.Router.AddCommand(&bcr.Command{
+		Name:              "charinfo",
+		Summary:           "Get character info",
+		Usage:             "<text>",
+		Args:              bcr.MinArgs(1),
+		CustomPermissions: b.Checker,
+		Command:           b.charinfo,
+	})
+
 	valid := b.Router.AddCommand(&bcr.Command{
 		Name:              "valid",
-		Usage:             "Get a valid response!",
+		Summary:           "Get a valid response!",
 		CustomPermissions: b.Checker,
 		Command:           b.validCmd,
 	})
