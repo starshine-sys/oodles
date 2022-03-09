@@ -20,6 +20,7 @@ import (
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/levels"
 	"github.com/starshine-sys/oodles/logging"
+	"github.com/starshine-sys/oodles/star"
 	"go.uber.org/zap"
 )
 
@@ -60,6 +61,7 @@ func main() {
 	fun.Init(b)
 	moderation.Init(b)
 	reminders.Init(b)
+	star.Init(b)
 
 	state, _ := b.Router.StateFromGuildID(0)
 	botUser, _ := state.Me()

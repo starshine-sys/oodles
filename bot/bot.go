@@ -6,6 +6,7 @@ import (
 
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/bcr/bot"
 	"github.com/starshine-sys/oodles/common"
@@ -19,6 +20,7 @@ type Bot struct {
 
 	Colour discord.Color
 
+	State     *state.State
 	DB        *db.DB
 	Scheduler *Scheduler
 	Checker   *Checker
@@ -59,6 +61,8 @@ func New(conf common.BotConfig) (b *Bot, err error) {
 	// bot handlers
 	b.Router.AddHandler(b.WaitForGuild)
 	b.Router.AddHandler(b.Ready)
+
+	b.State, _ = b.Router.StateFromGuildID(b.DB.BotConfig.GuildID)
 
 	return b, nil
 }
