@@ -65,7 +65,7 @@ func (bot *Bot) remindme(ctx *bcr.Context) (err error) {
 		rm = "**" + rm + "**"
 	}
 
-	content := fmt.Sprintf("Okay %v, I'll remind you about %v %v. (<t:%v>, #%v)", ctx.DisplayName(), rm, bcr.HumanizeTime(bcr.DurationPrecisionSeconds, t.Add(time.Second)), t.Unix(), id)
+	content := fmt.Sprintf("Okay %v, we'll remind you about %v %v! (<t:%v>, #%v)", ctx.DisplayName(), rm, bcr.HumanizeTime(bcr.DurationPrecisionSeconds, t.Add(time.Second)), t.Unix(), id)
 
 	msg, err := ctx.State.SendMessageComplex(ctx.Message.ChannelID, api.SendMessageData{
 		Content: content,
