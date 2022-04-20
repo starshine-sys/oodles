@@ -9,69 +9,32 @@ import (
 	"emperror.dev/errors"
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
-	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/dustin/go-humanize/english"
 	"github.com/jackc/pgx/v4"
+	"github.com/starshine-sys/bcr/v2"
 	"github.com/starshine-sys/oodles/common"
 	"github.com/starshine-sys/oodles/db"
 )
 
 const waitTime = 2 * time.Second
 
-func (bot *Bot) interactionCreate(ev *gateway.InteractionCreateEvent) {
-	if ev.GuildID != bot.DB.BotConfig.GuildID {
-		return
-	}
-
-	data, ok := ev.Data.(*discord.ButtonInteraction)
-	if !ok {
-		return
-	}
-
-	if data.CustomID == common.OpenApplication {
-		err := bot.createInterview(ev, data)
-		if err != nil {
-			common.Log.Errorf("Error in open application interaction: %v", err)
-		}
-		return
-	}
-
-	if data.CustomID == "restart-app" {
-		err := bot.restartAppInteraction(ev, data)
-		if err != nil {
-			common.Log.Errorf("Error in restart application: %v", err)
-		}
-		return
-	}
-
-	if strings.HasPrefix(string(data.CustomID), "app-track:") {
-		err := bot.chooseAppTrack(ev, data, strings.HasSuffix(string(data.CustomID), ":restart"))
-		if err != nil {
-			common.Log.Errorf("Error in choose app track: %v", err)
-		}
-	}
-}
-
-func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction) (err error) {
-	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
-
-	if ev.Member == nil {
-		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+func (bot *Bot) createInterview(ctx *bcr.ButtonContext) (err error) {
+	if ctx.Member == nil {
+		return ctx.ReplyEphemeral("This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
 	}
 
 	// i don't trust all the API calls to be fast enough
-	if err = bot.initialResponse(ev); err != nil {
+	if err = ctx.DeferEphemeral(); err != nil {
 		return err
 	}
 
 	// check application
-	existing, err := bot.DB.UserApplication(ev.Member.User.ID)
+	existing, err := bot.DB.UserApplication(ctx.User.ID)
 	if err == nil {
-		ch, err := s.Channel(existing.ChannelID)
+		ch, err := ctx.State.Channel(existing.ChannelID)
 		if err == nil {
-			_, err = bot.updateResponse(ev, "You already have an open application, in %v!", ch.Mention())
-			return err
+			return ctx.ReplyEphemeral(fmt.Sprintf("You already have an open application, in %v!", ch.Mention()))
 		}
 
 		// no channel, app should've been closed
@@ -83,33 +46,29 @@ func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discor
 
 	if err != nil && err != pgx.ErrNoRows {
 		bot.SendError("Unknown error fetching app: %v", err)
-		_, err = bot.updateResponse(ev, "There was an unknown error fetching an existing app!")
-		return
+		return ctx.ReplyEphemeral("There was an unknown error fetching an existing app!")
 	}
 
-	ch, err := bot.newApplicationChannel(*ev.Member)
+	ch, err := bot.newApplicationChannel(*ctx.Member)
 	if err != nil {
 		bot.SendError("Error creating application channel: %v", err)
-		_, err = bot.updateResponse(ev, "I couldn't create an application channel!")
-		return
+		return ctx.ReplyEphemeral("I couldn't create an application channel!")
 	}
 
-	app, err := bot.DB.CreateApplication(ev.Member.User.ID, ch.ID)
+	app, err := bot.DB.CreateApplication(ctx.User.ID, ch.ID)
 	if err != nil {
 		bot.SendError("Error registering application in DB: %v", err)
-		_, err = bot.updateResponse(ev, "I couldn't save the newly opened application!")
-		return
+		return ctx.ReplyEphemeral("I couldn't save the newly opened application!")
 	}
 
-	err = bot.sendInitialMessage(ch.ID, *ev.Member)
+	err = bot.sendInitialMessage(ch.ID, *ctx.Member)
 	if err != nil {
 		bot.SendError("Error sending initial message: %v", err)
-		_, err = bot.updateResponse(ev, "I couldn't send the initial message!")
-		return
+		return ctx.ReplyEphemeral("I couldn't send the initial message!")
 	}
 
 	eventID, err := bot.Scheduler.Add(
-		time.Now().Add(24*time.Hour), &timeout{ChannelID: ch.ID, UserID: ev.Member.User.ID},
+		time.Now().Add(24*time.Hour), &timeout{ChannelID: ch.ID, UserID: ctx.User.ID},
 	)
 	if err == nil {
 		if err := bot.DB.SetEventID(app.ID, eventID); err != nil {
@@ -119,31 +78,36 @@ func (bot *Bot) createInterview(ev *gateway.InteractionCreateEvent, data *discor
 		common.Log.Errorf("error adding timeout event for app %v: %v", app.ID, err)
 	}
 
-	_, err = bot.updateResponse(ev, "Application opened in %v!", ch.Mention())
-	return
+	return ctx.ReplyEphemeral("Application opened in " + ch.Mention() + "!")
 }
 
-func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction, isRestart bool) (err error) {
-	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
+func (bot *Bot) chooseAppTrack(ctx *bcr.ButtonContext) (err error) {
+	return bot.chooseAppTrackInner(ctx, false)
+}
 
-	if ev.Member == nil {
-		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+func (bot *Bot) chooseAppTrackAlreadyRestarted(ctx *bcr.ButtonContext) (err error) {
+	return bot.chooseAppTrackInner(ctx, true)
+}
+
+func (bot *Bot) chooseAppTrackInner(ctx *bcr.ButtonContext, isRestart bool) (err error) {
+	if ctx.Member == nil {
+		return ctx.ReplyEphemeral("This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
 	}
 
-	if ev.Message == nil {
-		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+	if ctx.Event.Message == nil {
+		return ctx.ReplyEphemeral("This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
 	}
 
-	app, err := bot.DB.ChannelApplication(ev.ChannelID)
+	app, err := bot.DB.ChannelApplication(ctx.Event.ChannelID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return bot.respond(ev, "This channel isn't an application channel!")
+			return ctx.ReplyEphemeral("This channel isn't an application channel!")
 		}
 		return
 	}
 
 	if app.TrackID != nil {
-		components := ev.Message.Components
+		components := ctx.Event.Message.Components
 		for _, c := range components {
 			v, ok := c.(*discord.ActionRowComponent)
 			if ok {
@@ -157,7 +121,7 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 			}
 		}
 
-		return s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+		return ctx.State.RespondInteraction(ctx.InteractionID, ctx.InteractionToken, api.InteractionResponse{
 			Type: api.UpdateMessage,
 			Data: &api.InteractionResponseData{
 				Components: &components,
@@ -165,13 +129,16 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 		})
 	}
 
-	if app.UserID != ev.Member.User.ID {
-		return bot.respond(ev, "You're not the user who this application is for.")
+	if app.UserID != ctx.User.ID {
+		return ctx.ReplyEphemeral("You're not the user who this application is for.")
 	}
 
-	ids := strings.TrimSuffix(
-		strings.TrimPrefix(string(data.CustomID), "app-track:"), ":restart",
-	)
+	ids := strings.TrimPrefix(string(ctx.CustomID), "app-track")
+	if isRestart {
+		ids = strings.TrimPrefix(ids, "-restart")
+	}
+	ids = strings.TrimPrefix(ids, ":")
+
 	trackID, err := strconv.ParseInt(ids, 10, 10)
 	if err != nil {
 		return err
@@ -183,7 +150,7 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 	}
 
 	// we have a track, so finish this interaction
-	components := ev.Message.Components
+	components := ctx.Event.Message.Components
 	hasRestartButton := false
 	for _, c := range components {
 		v, ok := c.(*discord.ActionRowComponent)
@@ -210,7 +177,7 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 		}
 	}
 
-	err = s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
+	err = ctx.State.RespondInteraction(ctx.InteractionID, ctx.InteractionToken, api.InteractionResponse{
 		Type: api.UpdateMessage,
 		Data: &api.InteractionResponseData{
 			Components: &components,
@@ -223,11 +190,11 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 	err = bot.DB.SetTrack(app.ID, track.ID)
 	if err != nil {
 		bot.SendError("Error setting application track in %v: %v", app.ChannelID.Mention(), err)
-		_, err = s.SendMessage(app.ChannelID, "Something went wrong! Please ask a mod for assistance.")
+		_, err = ctx.State.SendMessage(app.ChannelID, "Something went wrong! Please ask a mod for assistance.")
 		return
 	}
 
-	_, err = s.SendMessage(app.ChannelID, fmt.Sprintf("Starting **%v** application!\nIf you picked the wrong type, or wanna restart your application for any other reason, please press the \"restart\" button above!", track.Name))
+	_, err = ctx.State.SendMessage(app.ChannelID, fmt.Sprintf("Starting **%v** application!\nIf you picked the wrong type, or want to restart your application for any other reason, please press the \"restart\" button above!", track.Name))
 	if err != nil {
 		bot.SendError("error sending message: %v", err)
 	}
@@ -258,37 +225,37 @@ func (bot *Bot) chooseAppTrack(ev *gateway.InteractionCreateEvent, data *discord
 	return
 }
 
-func (bot *Bot) restartAppInteraction(ev *gateway.InteractionCreateEvent, data *discord.ButtonInteraction) error {
-	if ev.Member == nil {
-		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+func (bot *Bot) restartAppInteraction(ctx *bcr.ButtonContext) error {
+	if ctx.Member == nil {
+		return ctx.ReplyEphemeral("This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
 	}
 
-	if ev.Message == nil {
-		return bot.respond(ev, "This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
+	if ctx.Event.Message == nil {
+		return ctx.ReplyEphemeral("This event didn't have a member associated with it! This is a bug, please report it to the developer (such as by DMing me!)")
 	}
 
-	app, err := bot.DB.ChannelApplication(ev.ChannelID)
+	app, err := bot.DB.ChannelApplication(ctx.Event.ChannelID)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return bot.respond(ev, "This channel isn't an application channel!")
+			return ctx.ReplyEphemeral("This channel isn't an application channel!")
 		}
 		return err
 	}
 
-	if app.UserID != ev.Member.User.ID {
-		return bot.respond(ev, "You're not the user who this application is for.")
+	if app.UserID != ctx.User.ID {
+		return ctx.ReplyEphemeral("You're not the user who this application is for.")
 	}
 
 	err = bot.DB.ResetApplication(app.ID)
 	if err != nil {
 		bot.SendError("Error resetting application %v: %v", app.ID, err)
-		return bot.respond(ev, "Internal error occurred! Please ping staff for assistance.")
+		return ctx.ReplyEphemeral("Internal error occurred! Please ping staff for assistance.")
 	}
 
 	tracks, err := bot.DB.ApplicationTracks()
 	if err != nil {
 		bot.SendError("Error getting app tracks: %v", err)
-		return bot.respond(ev, "Internal error occurred! Please ping staff for assistance.")
+		return ctx.ReplyEphemeral("Internal error occurred! Please ping staff for assistance.")
 	}
 
 	str := "Are you "
@@ -300,7 +267,7 @@ func (bot *Bot) restartAppInteraction(ev *gateway.InteractionCreateEvent, data *
 		descs = append(descs, fmt.Sprintf("%v (%s)", t.Description, t.Emoji()))
 		buttons = append(buttons, &discord.ButtonComponent{
 			Label:    t.Name,
-			CustomID: discord.ComponentID("app-track:" + strconv.FormatInt(t.ID, 10) + ":restart"),
+			CustomID: discord.ComponentID("app-track-restart:" + strconv.FormatInt(t.ID, 10)),
 			Style:    discord.SecondaryButtonStyle(),
 			Emoji: &discord.ComponentEmoji{
 				Name:     t.Emoji().Name,
@@ -311,13 +278,9 @@ func (bot *Bot) restartAppInteraction(ev *gateway.InteractionCreateEvent, data *
 	}
 	str += english.OxfordWordSeries(descs, "or") + "?"
 
-	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
-	return s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
-		Type: api.MessageInteractionWithSource,
-		Data: &api.InteractionResponseData{
-			Content:    option.NewNullableString(str),
-			Components: &discord.ContainerComponents{&buttons},
-		},
+	return ctx.ReplyComplex(api.InteractionResponseData{
+		Content:    option.NewNullableString(str),
+		Components: &discord.ContainerComponents{&buttons},
 	})
 }
 

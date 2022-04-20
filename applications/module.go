@@ -1,16 +1,13 @@
 package applications
 
 import (
-	"fmt"
 	"sync"
 
-	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
-	"github.com/diamondburned/arikawa/v3/gateway"
-	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/spf13/pflag"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/bot"
+	"github.com/starshine-sys/oodles/common"
 )
 
 // Bot ...
@@ -27,7 +24,11 @@ func Init(bot *bot.Bot) {
 
 	b.Scheduler.AddType(&timeout{})
 
-	b.Router.AddHandler(b.interactionCreate)
+	b.Interactions.Button(common.OpenApplication).Exec(b.createInterview)
+	b.Interactions.Button("restart-app").Exec(b.restartAppInteraction)
+	b.Interactions.Button("app-track:*").Exec(b.chooseAppTrack)
+	b.Interactions.Button("app-track-restart:*").Exec(b.chooseAppTrackAlreadyRestarted)
+
 	b.Router.AddHandler(b.messageCreate)
 	b.Router.AddHandler(b.guildMemberAdd)
 	b.Router.AddHandler(b.guildMemberRemove)
@@ -92,42 +93,5 @@ func Init(bot *bot.Bot) {
 		Usage:             "[since]",
 		CustomPermissions: b.Checker,
 		Command:           b.restart,
-	})
-}
-
-func (bot *Bot) initialResponse(ev *gateway.InteractionCreateEvent) error {
-	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
-
-	return s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
-		Type: api.DeferredMessageInteractionWithSource,
-		Data: &api.InteractionResponseData{
-			Flags: api.EphemeralResponse,
-		},
-	})
-}
-
-func (bot *Bot) respond(ev *gateway.InteractionCreateEvent, tmpl string, args ...interface{}) error {
-	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
-
-	return s.RespondInteraction(ev.ID, ev.Token, api.InteractionResponse{
-		Type: api.MessageInteractionWithSource,
-		Data: &api.InteractionResponseData{
-			Content: option.NewNullableString(fmt.Sprintf(tmpl, args...)),
-			Flags:   api.EphemeralResponse,
-			AllowedMentions: &api.AllowedMentions{
-				Parse: []api.AllowedMentionType{},
-			},
-		},
-	})
-}
-
-func (bot *Bot) updateResponse(ev *gateway.InteractionCreateEvent, tmpl string, args ...interface{}) (*discord.Message, error) {
-	s, _ := bot.Router.StateFromGuildID(bot.DB.BotConfig.GuildID)
-
-	return s.EditInteractionResponse(discord.AppID(bot.Router.Bot.ID), ev.Token, api.EditInteractionResponseData{
-		Content: option.NewNullableString(fmt.Sprintf(tmpl, args...)),
-		AllowedMentions: &api.AllowedMentions{
-			Parse: []api.AllowedMentionType{},
-		},
 	})
 }
