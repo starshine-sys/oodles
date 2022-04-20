@@ -52,8 +52,9 @@ github.com/denisenkom/go-mssqldb v0.9.0/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27N
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/diamondburned/arikawa/v3 v3.0.0-rc.2/go.mod h1:sNqM/iGXuH87wEH1rpQBEY1PR0AAkRKJuUhJGOdo7To=
-github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20211220235611-bc8a2b0cae3f h1:bWF+FCEZ0uEetpqQdny2K7rwAxLqyPVs8y4rpra+SMQ=
 github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20211220235611-bc8a2b0cae3f/go.mod h1:5jBSNnp82Z/EhsKa6Wk9FsOqSxfVkNZDTDBPOj47LpY=
+github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e h1:GKPbEZ6+CCt8oO4rHMMSCZTltzjxZ6hQeGGuDB5banI=
+github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e/go.mod h1:5jBSNnp82Z/EhsKa6Wk9FsOqSxfVkNZDTDBPOj47LpY=
 github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1ei82L+c=
 github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44amcmDAg8hxG0Ewe4=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
@@ -119,7 +120,6 @@ github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T
 github.com/huandu/xstrings v1.3.2/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/imdario/mergo v0.3.11/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
-github.com/jackc/chunkreader v1.0.0 h1:4s39bBR8ByfqH+DKm8rQA3E1LHZWB9XWcrz8fqaZbe0=
 github.com/jackc/chunkreader v1.0.0/go.mod h1:RT6O25fNZIuasFJRyZ4R/Y2BbhasbmZXF9QQ7T3kePo=
 github.com/jackc/chunkreader/v2 v2.0.0/go.mod h1:odVSm741yZoC3dpHEUXIqA9tQRhFrgOHwnPIn9lDKlk=
 github.com/jackc/chunkreader/v2 v2.0.1 h1:i+RDz65UE+mmpjTfyz0MoVTnzeYxroil2G82ki7MGG8=
@@ -147,7 +147,6 @@ github.com/jackc/pgmock v0.0.0-20210724152146-4ad1a8207f65 h1:DadwsjnMwFjfWc9y5W
 github.com/jackc/pgmock v0.0.0-20210724152146-4ad1a8207f65/go.mod h1:5R2h2EEX+qri8jOWMbJCtaPWkrrNc7OHwsp2TCqp7ak=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
-github.com/jackc/pgproto3 v1.1.0 h1:FYYE4yRw+AgI8wXIinMlNjBbp/UitDJwfj5LqqewP1A=
 github.com/jackc/pgproto3 v1.1.0/go.mod h1:eR5FA3leWg7p9aeAqi37XOTgTIbkABlvcPB3E5rlc78=
 github.com/jackc/pgproto3/v2 v2.0.0-alpha1.0.20190420180111-c116219b62db/go.mod h1:bhq50y+xrl9n5mRYyCBFKkpRVTLYJVWeCc+mEAI3yXA=
 github.com/jackc/pgproto3/v2 v2.0.0-alpha1.0.20190609003834-432c2951c711/go.mod h1:uH0AWtUmuShn0bcesswc4aBTWGvw0cAxIJp+6OB//Wg=
@@ -318,6 +317,10 @@ github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An
 github.com/spf13/viper v1.4.0/go.mod h1:PTJ7Z/lr49W6bUbkmS1V3by4uWynFiR9p7+dSq/yZzE=
 github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b h1:Jva39EW3WcvXKEfhpDNh63ygdeZkhsSD0FpJV8ink3I=
 github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b/go.mod h1:xUfJ0KK3qxEzaJvAK7W8WRgw1LC+3mOFjyQmtbSZagY=
+github.com/starshine-sys/bcr v0.21.1-0.20220418214743-4b4aef09222d h1:SYdSmMSoFalnLhIqH33CjObDKhHPIFSC0xGJ/qsy4rM=
+github.com/starshine-sys/bcr v0.21.1-0.20220418214743-4b4aef09222d/go.mod h1:2rQ9n9suPfBUAcIrSnu+LoaMvSRLKZoxxDba5QvyOnk=
+github.com/starshine-sys/bcr/v2 v2.0.0-20220420122254-9c6db8240bcf h1:g6BoW10+uehWrSgfYMDagDInrQThh/rxI5jJ0uipCP8=
+github.com/starshine-sys/bcr/v2 v2.0.0-20220420122254-9c6db8240bcf/go.mod h1:1zF2bK88fwpXPqlHGR2LZPQy4EymMJrWFktn+81NnI4=
 github.com/starshine-sys/dischtml v0.1.1-0.20211028145618-7e1ef8c772bb h1:bSJct6ENxnoOtsJSBSdocHcr19kWLoILXL4kaAV2JAg=
 github.com/starshine-sys/dischtml v0.1.1-0.20211028145618-7e1ef8c772bb/go.mod h1:8yIpm/ZlHDmYH0Fd+ynUc3y3HzpnDM1d6+ZsO5SFJ4w=
 github.com/starshine-sys/pkgo/v2 v2.0.1 h1:Jm9WON0Y4teQyJKZjMyAia7aIA8vg/IuNmpbVZUubGM=

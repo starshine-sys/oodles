@@ -1,6 +1,6 @@
 module github.com/starshine-sys/oodles
 
-go 1.17
+go 1.18
 
 require (
 	1f320.xyz/x v0.0.0-20220202151421-a578bc87e703
@@ -9,7 +9,7 @@ require (
 	github.com/AndreKR/multiface v0.0.0-20211114051930-f51f19dee2dc
 	github.com/BurntSushi/toml v0.4.1
 	github.com/Masterminds/squirrel v1.5.2
-	github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20211220235611-bc8a2b0cae3f
+	github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e
 	github.com/disintegration/imaging v1.6.2
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fogleman/gg v1.3.0
@@ -25,7 +25,8 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20211023115951-9f02b1e13857
 	github.com/spf13/cast v1.4.1
 	github.com/spf13/pflag v1.0.5
-	github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b
+	github.com/starshine-sys/bcr v0.21.1-0.20220418214743-4b4aef09222d
+	github.com/starshine-sys/bcr/v2 v2.0.0-20220420122254-9c6db8240bcf
 	github.com/starshine-sys/dischtml v0.1.1-0.20211028145618-7e1ef8c772bb
 	github.com/starshine-sys/pkgo/v2 v2.0.1
 	go.uber.org/zap v1.16.0
