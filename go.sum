@@ -52,7 +52,6 @@ github.com/denisenkom/go-mssqldb v0.9.0/go.mod h1:xbL0rPBG9cCiLr28tMa8zpbdarY27N
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
 github.com/diamondburned/arikawa/v3 v3.0.0-rc.2/go.mod h1:sNqM/iGXuH87wEH1rpQBEY1PR0AAkRKJuUhJGOdo7To=
-github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20211220235611-bc8a2b0cae3f/go.mod h1:5jBSNnp82Z/EhsKa6Wk9FsOqSxfVkNZDTDBPOj47LpY=
 github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e h1:GKPbEZ6+CCt8oO4rHMMSCZTltzjxZ6hQeGGuDB5banI=
 github.com/diamondburned/arikawa/v3 v3.0.0-rc.4.0.20220214064026-6dc189519c4e/go.mod h1:5jBSNnp82Z/EhsKa6Wk9FsOqSxfVkNZDTDBPOj47LpY=
 github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1ei82L+c=
@@ -315,10 +314,8 @@ github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnIn
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
 github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
 github.com/spf13/viper v1.4.0/go.mod h1:PTJ7Z/lr49W6bUbkmS1V3by4uWynFiR9p7+dSq/yZzE=
-github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b h1:Jva39EW3WcvXKEfhpDNh63ygdeZkhsSD0FpJV8ink3I=
-github.com/starshine-sys/bcr v0.21.1-0.20220129145234-cf99e75d019b/go.mod h1:xUfJ0KK3qxEzaJvAK7W8WRgw1LC+3mOFjyQmtbSZagY=
-github.com/starshine-sys/bcr v0.21.1-0.20220418214743-4b4aef09222d h1:SYdSmMSoFalnLhIqH33CjObDKhHPIFSC0xGJ/qsy4rM=
-github.com/starshine-sys/bcr v0.21.1-0.20220418214743-4b4aef09222d/go.mod h1:2rQ9n9suPfBUAcIrSnu+LoaMvSRLKZoxxDba5QvyOnk=
+github.com/starshine-sys/bcr v0.21.1-0.20220609012351-1ea0be4e35fa h1:l1UrqZtPHKZLZ4XDas6d0dELOV5i77VCLqSshcIAFxg=
+github.com/starshine-sys/bcr v0.21.1-0.20220609012351-1ea0be4e35fa/go.mod h1:2rQ9n9suPfBUAcIrSnu+LoaMvSRLKZoxxDba5QvyOnk=
 github.com/starshine-sys/bcr/v2 v2.0.0-20220420122254-9c6db8240bcf h1:g6BoW10+uehWrSgfYMDagDInrQThh/rxI5jJ0uipCP8=
 github.com/starshine-sys/bcr/v2 v2.0.0-20220420122254-9c6db8240bcf/go.mod h1:1zF2bK88fwpXPqlHGR2LZPQy4EymMJrWFktn+81NnI4=
 github.com/starshine-sys/dischtml v0.1.1-0.20211028145618-7e1ef8c772bb h1:bSJct6ENxnoOtsJSBSdocHcr19kWLoILXL4kaAV2JAg=
