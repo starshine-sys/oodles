@@ -94,7 +94,7 @@ func (bot *Bot) getUser(guildID discord.GuildID, userID discord.UserID) (l UserL
 }
 
 func (bot *Bot) incrementXP(guildID discord.GuildID, userID discord.UserID) (newXP int64, err error) {
-	xp := 2 + rand.Intn(4)
+	xp := 15 + rand.Intn(12)
 
 	err = bot.DB.Pool.QueryRow(context.Background(), "update levels set xp = xp + $4, last_xp = $3 where guild_id = $1 and user_id = $2 returning xp", guildID, userID, time.Now().UTC(), xp).Scan(&newXP)
 	return
