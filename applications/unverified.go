@@ -9,6 +9,7 @@ import (
 	"codeberg.org/eviedelta/detctime/durationparser"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/starshine-sys/bcr"
+	"github.com/starshine-sys/oodles/db"
 )
 
 // Time that users can be unverified + no app open before showing up in oo.unverified
@@ -46,6 +47,19 @@ func (bot *Bot) unverified(ctx *bcr.Context) (err error) {
 			return ctx.SendfX("There are no unverified members who joined before %v ago!", bcr.HumanizeDuration(bcr.DurationPrecisionMinutes, dur))
 		}
 	}
+
+	ms = reduceMembers(ms, func(m discord.Member) bool {
+		for _, ov := range append(bot.DB.Perms.Staff, bot.DB.Perms.Helper...) {
+			if ov.Type == db.UserPermission && ov.ID == discord.Snowflake(m.User.ID) {
+				return false
+			}
+
+			if ov.Type == db.RolePermission && containsRole(m.RoleIDs, discord.RoleID(ov.ID)) {
+				return false
+			}
+		}
+		return true
+	})
 
 	ms = reduceMembers(ms, func(m discord.Member) bool {
 		hasApp := false
