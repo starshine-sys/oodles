@@ -10,7 +10,7 @@ import (
 	"github.com/starshine-sys/oodles/common"
 )
 
-const ScheduledCloseTime = time.Minute
+const ScheduledCloseTime = 24 * time.Hour
 
 func (bot *Bot) closeCancel(ctx *bcr.Context) (err error) {
 	app, err := bot.DB.ChannelApplication(ctx.Message.ChannelID)
