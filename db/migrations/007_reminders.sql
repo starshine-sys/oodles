@@ -13,7 +13,7 @@ create or replace view reminders as
     (data->'set_time'->>0)::timestamp as set_time
     from public.scheduled_events where event_type = 'reminders.reminder';
 
-create extension hstore;
+create extension if not exists hstore;
 
 create table users (
     id      bigint  primary key,

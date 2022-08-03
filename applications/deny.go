@@ -148,14 +148,32 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 		return ctx.SendfX("There was an error saving a transcript:\n> %v", err)
 	}
 
+	// schedule closing
+	eventID, err := bot.Scheduler.Add(
+		time.Now().Add(ScheduledCloseTime), &scheduledClose{ChannelID: app.ChannelID},
+	)
+	if err == nil {
+		if err := bot.DB.SetCloseID(app.ID, eventID); err != nil {
+			common.Log.Errorf("error setting scheduled close id for app %v: %v", app.ID, err)
+		}
+	} else {
+		common.Log.Errorf("error adding scheduled close for app %v: %v", app.ID, err)
+	}
+
 	// edit channel
-	cat, err := ctx.State.Channel(ctx.Channel.ParentID)
+	newCat := discord.ChannelID(bot.DB.Config.Get("finished_application_category").ToSnowflake())
+	if !newCat.IsValid() {
+		newCat = ctx.Channel.ParentID
+	}
+
+	cat, err := ctx.State.Channel(newCat)
 	if err != nil {
 		return ctx.SendfX("Couldn't get this channel's category.")
 	}
 
 	return ctx.State.ModifyChannel(app.ChannelID, api.ModifyChannelData{
 		Name:           "🔒-app-" + unidecode.Unidecode(m.User.Username),
+		CategoryID:     newCat,
 		Overwrites:     &cat.Overwrites,
 		AuditLogReason: "Application completed, user denied",
 	})

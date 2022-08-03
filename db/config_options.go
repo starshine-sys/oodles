@@ -54,6 +54,11 @@ var ConfigOptions = map[string]ConfigOption{
 		Type:         SnowflakeOptionType,
 		DefaultValue: 0,
 	},
+	"finished_application_category": {
+		Description:  "The category that holds finished applications until they are closed.",
+		Type:         SnowflakeOptionType,
+		DefaultValue: 0,
+	},
 	"transcript_channel": {
 		Description:  "The channel where application transcripts are saved.",
 		Type:         SnowflakeOptionType,

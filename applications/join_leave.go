@@ -2,8 +2,10 @@ package applications
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
+	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
 	"github.com/mozillazg/go-unidecode"
 	"github.com/starshine-sys/oodles/common"
@@ -56,7 +58,20 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 		common.Log.Errorf("Error sending message: %v", err)
 	}
 
+	newCat := discord.ChannelID(bot.DB.Config.Get("finished_application_category").ToSnowflake())
+	if !newCat.IsValid() {
+		newCat = discord.ChannelID(bot.DB.Config.Get("application_category").ToSnowflake())
+	}
+
+	var overwrites *[]discord.Overwrite
+	cat, err := s.Channel(newCat)
+	if err == nil {
+		overwrites = &cat.Overwrites
+	}
+
 	err = s.ModifyChannel(app.ChannelID, api.ModifyChannelData{
+		CategoryID:     newCat,
+		Overwrites:     overwrites,
 		Name:           "📤-app-" + unidecode.Unidecode(ev.User.Username),
 		AuditLogReason: "User left server before application was completed",
 	})
@@ -84,5 +99,16 @@ func (bot *Bot) guildMemberRemove(ev *gateway.GuildMemberRemoveEvent) {
 			common.Log.Errorf("Error sending message: %v", err)
 		}
 		return
+	}
+
+	eventID, err := bot.Scheduler.Add(
+		time.Now().Add(ScheduledCloseTime), &scheduledClose{ChannelID: app.ChannelID},
+	)
+	if err == nil {
+		if err := bot.DB.SetCloseID(app.ID, eventID); err != nil {
+			common.Log.Errorf("error setting scheduled close id for app %v: %v", app.ID, err)
+		}
+	} else {
+		common.Log.Errorf("error adding scheduled close for app %v: %v", app.ID, err)
 	}
 }

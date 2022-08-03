@@ -39,6 +39,7 @@ type Application struct {
 
 	// The scheduled event used to notify when the app times out
 	ScheduledEventID *int64
+	ScheduledCloseID *int64
 }
 
 // AllUserApplications returns all of this user's applications, sorted by ID descending.
@@ -113,6 +114,11 @@ func (db *DB) SetTranscript(appID xid.ID, chID discord.ChannelID, msgID discord.
 
 func (db *DB) SetEventID(appID xid.ID, eventID int64) error {
 	_, err := db.Exec(context.Background(), "update applications set scheduled_event_id = $1 where id = $2", eventID, appID)
+	return err
+}
+
+func (db *DB) SetCloseID(appID xid.ID, eventID int64) error {
+	_, err := db.Exec(context.Background(), "update applications set scheduled_close_id = $1 where id = $2", eventID, appID)
 	return err
 }
 

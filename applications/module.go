@@ -23,6 +23,7 @@ func Init(bot *bot.Bot) {
 	b := &Bot{bot, sync.RWMutex{}, make(map[discord.UserID]struct{})}
 
 	b.Scheduler.AddType(&timeout{})
+	b.Scheduler.AddType(&scheduledClose{})
 
 	b.Interactions.Button(common.OpenApplication).Exec(b.createInterview)
 	b.Interactions.Button("restart-app").Exec(b.restartAppInteraction)
@@ -41,7 +42,7 @@ func Init(bot *bot.Bot) {
 		Command:           b.verify,
 	})
 
-	b.Router.AddCommand(&bcr.Command{
+	close := b.Router.AddCommand(&bcr.Command{
 		Name:              "close",
 		Summary:           "Close the current application",
 		CustomPermissions: b.Checker,
@@ -51,6 +52,17 @@ func Init(bot *bot.Bot) {
 			return fs
 		},
 	})
+
+	close.AddSubcommand(&bcr.Command{
+		Name:              "cancel",
+		Summary:           "Cancel closing the current application",
+		CustomPermissions: b.Checker,
+		Command:           b.closeCancel,
+	})
+
+	b.Router.AddCommand(
+		b.Router.AliasMust("cc", []string{}, []string{"close", "cancel"}, nil),
+	)
 
 	b.Router.AddCommand(&bcr.Command{
 		Name:              "deny",
