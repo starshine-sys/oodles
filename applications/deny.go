@@ -2,6 +2,7 @@ package applications
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/diamondburned/arikawa/v3/api"
@@ -9,12 +10,26 @@ import (
 	"github.com/mozillazg/go-unidecode"
 	"github.com/starshine-sys/bcr"
 	"github.com/starshine-sys/oodles/common"
+	"github.com/starshine-sys/oodles/common/parameters"
 )
 
+var channelRegexp = regexp.MustCompile(`^<#\d{15,}>$`)
+
 func (bot *Bot) deny(ctx *bcr.Context) (err error) {
-	app, err := bot.DB.ChannelApplication(ctx.Message.ChannelID)
+	params := parameters.NewParameters(ctx.RawArgs, false)
+
+	appChannelID := ctx.Message.ChannelID
+	if channelRegexp.MatchString(params.Peek()) {
+		ch, err := ctx.ParseChannel(params.Pop())
+		if err != nil {
+			return ctx.SendfX("Error parsing channel: %v", err)
+		}
+		appChannelID = ch.ID
+	}
+
+	app, err := bot.DB.ChannelApplication(appChannelID)
 	if err != nil {
-		return ctx.SendX("This isn't an application channel!")
+		return ctx.SendX("That isn't an application channel!")
 	}
 
 	if app.UserID == ctx.Author.ID {
@@ -56,7 +71,7 @@ func (bot *Bot) deny(ctx *bcr.Context) (err error) {
 		}
 	}
 
-	reason := ctx.RawArgs
+	reason := params.Remainder(false)
 	if reason == "" {
 		reason = "No reason specified"
 	}
